@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MP Intel</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080b0f;--surface:#0f1318;--surface2:#161b22;--border:#1c2330;--accent:#00e5a0;--blue:#3b82f6;--orange:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+header{position:sticky;top:0;z-index:100;background:rgba(8,11,15,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;gap:1rem;}
+.logo{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.12em;display:flex;align-items:center;gap:.5rem;}
+.live-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 6px var(--accent)}50%{opacity:.3;box-shadow:none}}
+.filter-input{flex:1;max-width:380px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.74rem;padding:.45rem .85rem;outline:none;transition:border-color .2s;}
+.filter-input:focus{border-color:var(--accent);}
+.filter-input::placeholder{color:var(--muted);}
+.hright{display:flex;align-items:center;gap:.65rem;font-family:var(--mono);font-size:.64rem;color:var(--muted);}
+.hbtn{font-family:var(--mono);font-size:.64rem;padding:.3rem .65rem;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.hbtn.on{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,.06);}
+.ticket-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:.55rem 1.5rem;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
+.ticket-lbl{font-family:var(--mono);font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.ticket-input{flex:1;min-width:200px;max-width:300px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.72rem;padding:.36rem .72rem;outline:none;}
+.tbtn{font-family:var(--mono);font-size:.65rem;padding:.36rem .85rem;border:none;cursor:pointer;font-weight:700;letter-spacing:.06em;transition:all .15s;white-space:nowrap;}
+.tbtn-p{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.tbtn-c{background:var(--accent);color:#000;}
+.t-ok{font-family:var(--mono);font-size:.63rem;color:var(--accent);display:none;}
+.t-err{font-family:var(--mono);font-size:.63rem;color:var(--red);display:none;}
+.t-hint{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-left:auto;}
+.t-hint a{color:var(--blue);text-decoration:none;}
+.mtag{font-family:var(--mono);font-size:.57rem;padding:.18rem .5rem;border:1px solid rgba(0,229,160,.25);color:var(--accent);background:rgba(0,229,160,.05);}
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);background:var(--border);gap:1px;border-bottom:1px solid var(--border);}
+.stat{background:var(--surface);padding:.72rem 1.1rem;}
+.stat-lbl{font-family:var(--mono);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;}
+.stat-val{font-family:var(--mono);font-size:1.15rem;font-weight:700;line-height:1;}
+.g{color:var(--accent)}.b{color:var(--blue)}.o{color:var(--orange)}
+.controls{display:flex;align-items:center;gap:.45rem;padding:.55rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;}
+.ctrl-lbl{font-family:var(--mono);font-size:.58rem;color:var(--muted);}
+.ctrl-btn{font-family:var(--mono);font-size:.62rem;padding:.26rem .62rem;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.ctrl-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.08);}
+.sf{margin-left:auto;display:flex;gap:.3rem;}
+.sf-btn{font-family:var(--mono);font-size:.59rem;padding:.24rem .55rem;border:1px solid transparent;cursor:pointer;background:transparent;transition:all .15s;}
+.sf-btn.s-all{border-color:var(--border);color:var(--muted);}
+.sf-btn.s-all.active{border-color:var(--text);color:var(--text);}
+.sf-btn.s-open{color:rgba(0,229,160,.4);}
+.sf-btn.s-open.active{color:var(--accent);border-color:rgba(0,229,160,.3);background:rgba(0,229,160,.06);}
+.sf-btn.s-adj{color:rgba(59,130,246,.4);}
+.sf-btn.s-adj.active{color:var(--blue);border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.06);}
+.sf-btn.s-closed{color:rgba(100,116,139,.4);}
+.sf-btn.s-closed.active{color:var(--muted);border-color:rgba(100,116,139,.3);background:rgba(100,116,139,.06);}
+.layout{display:grid;grid-template-columns:1fr 340px;overflow:hidden;height:calc(100vh - 52px - 46px - 56px - 40px - 28px);}
+.table-wrap{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.table-wrap::-webkit-scrollbar{width:4px;}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--border);}
+table{width:100%;border-collapse:collapse;}
+thead{position:sticky;top:0;z-index:10;background:var(--surface2);}
+th{font-family:var(--mono);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;text-align:left;padding:.6rem 1rem;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+th:hover{color:var(--text);}th.sorted{color:var(--accent);}
+tbody tr{border-bottom:1px solid rgba(28,35,48,.6);cursor:pointer;transition:background .1s;}
+tbody tr:hover{background:var(--surface2);}
+tbody tr.selected{background:rgba(59,130,246,.07);border-left:2px solid var(--blue);}
+@keyframes flashIn{0%{background:rgba(0,229,160,.15)}100%{background:transparent}}
+.new-row{animation:flashIn 3s ease-out;}
+td{padding:.56rem 1rem;vertical-align:middle;}
+.td-id{font-family:var(--mono);font-size:.58rem;color:var(--blue);white-space:nowrap;}
+.td-title{max-width:250px;}
+.td-inner{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.78rem;line-height:1.4;}
+.td-org{font-size:.68rem;color:var(--muted);max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-amt{font-family:var(--mono);font-size:.7rem;color:var(--orange);white-space:nowrap;text-align:right;}
+.td-date{font-family:var(--mono);font-size:.6rem;color:var(--muted);white-space:nowrap;}
+.badge{font-family:var(--mono);font-size:.54rem;padding:.14rem .4rem;white-space:nowrap;letter-spacing:.04em;}
+.ba{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2);}
+.bb{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+.bc{background:rgba(100,116,139,.08);color:var(--muted);border:1px solid rgba(100,116,139,.15);}
+.br{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.15);}
+.detail{border-left:1px solid var(--border);overflow-y:auto;scrollbar-width:thin;background:var(--surface);}
+.d-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;padding:2rem;text-align:center;color:var(--muted);}
+.d-empty-ico{font-size:1.8rem;opacity:.2;}
+.d-empty-txt{font-family:var(--mono);font-size:.64rem;line-height:1.7;opacity:.6;}
+.d-header{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);background:var(--surface2);position:sticky;top:0;z-index:5;}
+.d-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem;}
+.d-id{font-family:var(--mono);font-size:.61rem;color:var(--blue);}
+.d-title{font-size:.86rem;font-weight:700;line-height:1.4;}
+.d-body{padding:.9rem 1.1rem;display:flex;flex-direction:column;gap:.85rem;}
+.d-st{font-family:var(--mono);font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.45rem;padding-bottom:.32rem;border-bottom:1px solid var(--border);}
+.kv{display:flex;justify-content:space-between;padding:.34rem 0;gap:.7rem;}
+.kv+.kv{border-top:1px solid rgba(28,35,48,.5);}
+.kv-k{font-family:var(--mono);font-size:.61rem;color:var(--muted);flex-shrink:0;}
+.kv-v{font-family:var(--mono);font-size:.63rem;color:var(--text);text-align:right;word-break:break-word;}
+.kv-v.o{color:var(--orange)}
+.winner-box{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);padding:.72rem;margin-bottom:.35rem;}
+.winner-name{font-size:.84rem;font-weight:700;color:var(--accent);margin-bottom:.22rem;}
+.winner-meta{font-family:var(--mono);font-size:.61rem;color:var(--muted);margin-top:.1rem;}
+.d-desc{font-family:var(--mono);font-size:.63rem;color:var(--muted);line-height:1.6;max-height:95px;overflow-y:auto;}
+.abtn{width:100%;padding:.6rem;font-family:var(--mono);font-size:.65rem;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;text-decoration:none;display:block;letter-spacing:.05em;margin-top:.28rem;}
+.abtn:hover{border-color:var(--blue);color:var(--blue);}
+.abtn.p{border-color:rgba(0,229,160,.3);color:var(--accent);background:rgba(0,229,160,.04);}
+.loading-overlay{position:absolute;inset:0;background:rgba(8,11,15,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;z-index:50;font-family:var(--mono);font-size:.72rem;color:var(--muted);}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pbar{width:200px;height:2px;background:var(--border);overflow:hidden;}
+.pfill{height:100%;background:var(--accent);transition:width .3s;width:0%;}
+.pagination{padding:.6rem 1.5rem;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:.62rem;color:var(--muted);}
+.pbtn{font-family:var(--mono);font-size:.62rem;padding:.26rem .62rem;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.pbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+.pbtn:disabled{opacity:.3;cursor:not-allowed;}
+.statusbar{height:28px;background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1.5rem;font-family:var(--mono);font-size:.59rem;color:var(--muted);}
+.countdown{color:var(--orange);font-weight:700;}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.detail{display:none}.stats-bar{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="live-dot"></div>MP_INTEL</div>
+  <input class="filter-input" id="filterInput" type="text" placeholder="Filtrar por nombre, organismo, proveedor..." oninput="applyFilters()" autocomplete="off">
+  <div class="hright">
+    <span id="hStatus">—</span>
+    <button class="hbtn on" id="autoBtn" onclick="toggleAuto()">⟳ AUTO</button>
+  </div>
+</header>
+
+<div class="ticket-bar">
+  <span class="ticket-lbl">Ticket:</span>
+  <input class="ticket-input" id="ticketInput" type="text" placeholder="Tu ticket API de ChileCompra..." autocomplete="off" spellcheck="false">
+  <button class="tbtn tbtn-p" onclick="usarPrueba()">TICKET DE PRUEBA</button>
+  <button class="tbtn tbtn-c" onclick="cargar()">CARGAR ▶</button>
+  <span class="t-ok" id="tOk">✓ Conectado</span>
+  <span class="t-err" id="tErr"></span>
+  <span class="mtag">JSONP · sin proxy</span>
+  <span class="t-hint"><a href="https://api.mercadopublico.cl/modules/Participa.aspx" target="_blank">Solicitar ticket gratis ↗</a></span>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-lbl">Total</div><div class="stat-val b" id="stTotal">—</div></div>
+  <div class="stat"><div class="stat-lbl">Publicadas</div><div class="stat-val g" id="stOpen">—</div></div>
+  <div class="stat"><div class="stat-lbl">Adjudicadas</div><div class="stat-val b" id="stAdj">—</div></div>
+  <div class="stat"><div class="stat-lbl">Monto prom.</div><div class="stat-val o" id="stAvg">—</div></div>
+  <div class="stat"><div class="stat-lbl">Mostrando</div><div class="stat-val" id="stFiltered">—</div></div>
+</div>
+
+<div class="controls">
+  <span class="ctrl-lbl">MODO:</span>
+  <button class="ctrl-btn active" data-mode="activas" onclick="setMode(this)">Publicadas activas</button>
+  <button class="ctrl-btn" data-mode="adjudicadas" onclick="setMode(this)">Adjudicadas</button>
+  <button class="ctrl-btn" data-mode="hoy" onclick="setMode(this)">Hoy</button>
+  <div class="sf">
+    <button class="sf-btn s-all active" data-s="todos" onclick="setStatus(this)">TODOS</button>
+    <button class="sf-btn s-open" data-s="5" onclick="setStatus(this)">● PUBLICADA</button>
+    <button class="sf-btn s-adj" data-s="8" onclick="setStatus(this)">● ADJUDICADA</button>
+    <button class="sf-btn s-closed" data-s="6" onclick="setStatus(this)">● CERRADA</button>
+  </div>
+</div>
+
+<div class="layout" style="position:relative">
+  <div id="loadingOverlay" class="loading-overlay">
+    <div style="font-size:2.5rem;opacity:.25">⌕</div>
+    <div style="font-size:.82rem;color:var(--text)">Listo para cargar</div>
+    <div style="font-size:.64rem;opacity:.55;text-align:center">Presiona <strong style="color:var(--accent)">TICKET DE PRUEBA</strong> para comenzar</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;overflow:hidden">
+    <div class="table-wrap" style="flex:1">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('CodigoExterno')" id="th-CodigoExterno">CÓDIGO <span id="sort-CodigoExterno"></span></th>
+            <th onclick="sortBy('Nombre')" id="th-Nombre">NOMBRE <span id="sort-Nombre"></span></th>
+            <th onclick="sortBy('NombreOrg')" id="th-NombreOrg">ORGANISMO <span id="sort-NombreOrg"></span></th>
+            <th onclick="sortBy('MontoEstimado')" id="th-MontoEstimado" style="text-align:right">MONTO <span id="sort-MontoEstimado"></span></th>
+            <th onclick="sortBy('FechaPublicacion')" id="th-FechaPublicacion">PUBLICACIÓN <span id="sort-FechaPublicacion"></span></th>
+            <th onclick="sortBy('CodigoEstado')" id="th-CodigoEstado">ESTADO <span id="sort-CodigoEstado"></span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <button class="pbtn" id="prevBtn" onclick="changePage(-1)" disabled>← ANT</button>
+      <span id="pageInfo" style="color:var(--text)">—</span>
+      <button class="pbtn" id="nextBtn" onclick="changePage(1)" disabled>SIG →</button>
+    </div>
+  </div>
+
+  <div class="detail" id="detailPanel">
+    <div class="d-empty">
+      <div class="d-empty-ico">◎</div>
+      <div class="d-empty-txt">Haz click en una fila<br>para ver el detalle</div>
+    </div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <div style="display:flex;align-items:center;gap:.35rem">Método: <span style="color:var(--accent)">JSONP nativo</span></div>
+  <div style="display:flex;align-items:center;gap:.35rem">Actualizado: <span id="sbUpdated" style="color:var(--text)">—</span></div>
+  <div style="display:flex;align-items:center;gap:.35rem">Próx.: <span class="countdown" id="sbCd">—</span></div>
+  <div style="margin-left:auto"><span id="sbInfo" style="color:var(--muted)">—</span></div>
+</div>
+
+<script>
+var TICKET_PRUEBA='F8537A18-6766-4DEF-9E59-426B4FEE2844';
+var BASE='https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.jsonp';
+var PAGE_SIZE=50,AUTO_MS=300000,TIMEOUT=15000,cbCounter=0;
+var ticket='',allData=[],filtered=[],page=0,selectedCode=null;
+var autoOn=true,autoTimer=null,cdTimer=null,cdSecs=0;
+var loadMode='activas',statusFilter='todos';
+var sortField='FechaPublicacion',sortDir=-1;
+function $(id){return document.getElementById(id);}
+
+function fmtCLP(v){if(!v||v==0)return'—';var n=parseFloat(v);if(isNaN(n)||n==0)return'—';if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';return'$'+n.toFixed(0);}
+function parseFecha(d){if(!d)return 0;if(typeof d==='string'&&d.includes('Date(')){return parseInt(d.replace(/\/Date\((-?\d+)[^)]*\)\//,'$1'));}var ts=Date.parse(d);return isNaN(ts)?0:ts;}
+function fmtDate(d){var ts=parseFecha(d);if(!ts)return'—';return new Date(ts).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+function fmtDateL(d){var ts=parseFecha(d);if(!ts)return'—';return new Date(ts).toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'});}
+function hoyStr(){var d=new Date();return String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();}
+function statusInfo(cod){var c=parseInt(cod);if(c===5)return['PUBLICADA','ba'];if(c===8)return['ADJUDICADA','bb'];if(c===6)return['CERRADA','bc'];if(c===7)return['DESIERTA','bc'];if(c===18)return['REVOCADA','br'];if(c===19)return['SUSPENDIDA','br'];return['—','bc'];}
+
+function jsonpFetch(url){
+  return new Promise(function(resolve,reject){
+    var cbName='_mpCb'+(++cbCounter);
+    var tid;
+    window[cbName]=function(data){clearTimeout(tid);delete window[cbName];var s=document.getElementById(cbName);if(s)s.remove();resolve(data);};
+    tid=setTimeout(function(){delete window[cbName];var s=document.getElementById(cbName);if(s)s.remove();reject(new Error('Timeout: la API tardó más de 15s'));},TIMEOUT);
+    var s=document.createElement('script');
+    s.id=cbName;
+    s.src=url+'&callback='+cbName;
+    s.onerror=function(){clearTimeout(tid);delete window[cbName];s.remove();reject(new Error('No se pudo conectar con la API. Verifica tu conexión.'));};
+    document.head.appendChild(s);
+  });
+}
+
+function buildUrl(t,mode){
+  if(mode==='hoy')return BASE+'?fecha='+hoyStr()+'&ticket='+t;
+  if(mode==='activas')return BASE+'?estado=activas&ticket='+t;
+  if(mode==='adjudicadas')return BASE+'?estado=adjudicada&ticket='+t;
+  return BASE+'?ticket='+t;
+}
+
+function usarPrueba(){$('ticketInput').value=TICKET_PRUEBA;cargar();}
+function cargar(){
+  var t=$('ticketInput').value.trim();
+  if(!t){showErr('Ingresa un ticket');return;}
+  ticket=t;
+  $('tOk').style.display='none';
+  $('tErr').style.display='none';
+  try{localStorage.setItem('mp_ticket',t);}catch(e){}
+  loadData();
+}
+function showErr(msg){var el=$('tErr');el.textContent='✗ '+msg;el.style.display='inline';}
+
+function loadData(){
+  if(!ticket)return;
+  var ol=$('loadingOverlay');
+  ol.innerHTML='<div class="spinner"></div><div id="loadingMsg" style="font-size:.78rem;color:var(--text)">Conectando...</div><div class="pbar"><div class="pfill" id="pfill"></div></div><div style="font-size:.6rem;opacity:.5">JSONP — sin restricciones CORS</div>';
+  ol.style.display='flex';
+  setMsg(20,'Solicitando datos a ChileCompra...');
+  jsonpFetch(buildUrl(ticket,loadMode)).then(function(data){
+    setMsg(80,'Procesando...');
+    if(!data){throw new Error('Sin respuesta de la API');}
+    if(data.status==='error'){throw new Error(data.message||'Ticket inválido');}
+    var incoming=data.Listado||(Array.isArray(data)?data:[]);
+    var existingCodes=new Set(allData.map(function(l){return l.CodigoExterno;}));
+    incoming.forEach(function(l){l._isNew=!existingCodes.has(l.CodigoExterno);});
+    allData=incoming;
+    setMsg(100,'Listo.');
+    setTimeout(function(){ol.style.display='none';},250);
+    $('tOk').style.display='inline';
+    $('tErr').style.display='none';
+    $('sbUpdated').textContent=new Date().toLocaleTimeString('es-CL');
+    $('hStatus').textContent=allData.length+' licitaciones';
+    $('sbInfo').textContent=allData.length+' registros';
+    page=0;applyFilters();updateStats();scheduleAuto();
+  }).catch(function(e){
+    ol.style.display='none';
+    showErr(e.message);
+    $('tbody').innerHTML='<tr><td colspan="6"><div style="padding:2rem;font-family:var(--mono);font-size:.7rem;line-height:2;text-align:center"><div style="color:var(--red);font-size:.8rem">✗ '+e.message+'</div><div style="color:var(--muted);font-size:.62rem;margin-top:.5rem">Si el problema persiste, solicita tu propio ticket en<br><a href="https://api.mercadopublico.cl/modules/Participa.aspx" target="_blank" style="color:var(--blue)">api.mercadopublico.cl ↗</a></div></div></td></tr>';
+    console.error(e);
+  });
+}
+
+function setMsg(pct,msg){var pf=$('pfill');if(pf)pf.style.width=pct+'%';var lm=$('loadingMsg');if(lm)lm.textContent=msg;}
+
+function applyFilters(){
+  var q=$('filterInput').value.trim().toLowerCase();
+  filtered=allData.filter(function(l){
+    if(statusFilter!=='todos'&&String(l.CodigoEstado)!==statusFilter)return false;
+    if(q){var org=l.Organismo?l.Organismo.NombreOrganismo:'';var prov=(l.Adjudicacion?l.Adjudicacion.Proveedor||[]:[]).map(function(p){return p.NombreProveedor||'';}).join(' ');if(((l.Nombre||'')+' '+org+' '+(l.CodigoExterno||'')+' '+prov).toLowerCase().indexOf(q)<0)return false;}
+    return true;
+  });
+  filtered.sort(function(a,b){
+    var va,vb;
+    if(sortField==='MontoEstimado'){va=parseFloat(a.MontoEstimado)||0;vb=parseFloat(b.MontoEstimado)||0;}
+    else if(sortField==='FechaPublicacion'){va=parseFecha(a.FechaPublicacion);vb=parseFecha(b.FechaPublicacion);}
+    else if(sortField==='CodigoEstado'){va=parseInt(a.CodigoEstado)||0;vb=parseInt(b.CodigoEstado)||0;}
+    else if(sortField==='NombreOrg'){va=(a.Organismo?a.Organismo.NombreOrganismo:'').toLowerCase();vb=(b.Organismo?b.Organismo.NombreOrganismo:'').toLowerCase();}
+    else{va=(a[sortField]||'').toString().toLowerCase();vb=(b[sortField]||'').toString().toLowerCase();}
+    if(va<vb)return -sortDir;if(va>vb)return sortDir;return 0;
+  });
+  page=0;renderTable();$('stFiltered').textContent=filtered.length;
+}
+
+function renderTable(){
+  var total=filtered.length,start=page*PAGE_SIZE,end=Math.min(start+PAGE_SIZE,total);
+  $('pageInfo').textContent=total===0?'Sin resultados':(start+1)+'–'+end+' de '+total;
+  $('prevBtn').disabled=page===0;$('nextBtn').disabled=end>=total;
+  if(total===0){$('tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:3rem;font-family:var(--mono);font-size:.72rem;color:var(--muted)">Sin resultados</td></tr>';return;}
+  $('tbody').innerHTML=filtered.slice(start,end).map(function(l,i){
+    var idx=start+i,si=statusInfo(l.CodigoEstado),slabel=si[0],scls=si[1];
+    var org=l.Organismo?l.Organismo.NombreOrganismo:'—';
+    return '<tr onclick="selectRow('+idx+')" id="row-'+idx+'" class="'+(selectedCode===l.CodigoExterno?'selected':'')+' '+(l._isNew?'new-row':'')+'"><td class="td-id">'+(l.CodigoExterno||'—')+'</td><td class="td-title"><div class="td-inner">'+(l.Nombre||'Sin nombre')+'</div></td><td class="td-org">'+org+'</td><td class="td-amt">'+fmtCLP(l.MontoEstimado)+'</td><td class="td-date">'+fmtDate(l.FechaPublicacion)+'</td><td><span class="badge '+scls+'">'+slabel+'</span></td></tr>';
+  }).join('');
+}
+
+function changePage(dir){var max=Math.ceil(filtered.length/PAGE_SIZE)-1;page=Math.max(0,Math.min(max,page+dir));renderTable();document.querySelector('.table-wrap').scrollTop=0;}
+
+function updateStats(){
+  $('stTotal').textContent=allData.length;
+  $('stOpen').textContent=allData.filter(function(l){return parseInt(l.CodigoEstado)===5;}).length;
+  $('stAdj').textContent=allData.filter(function(l){return parseInt(l.CodigoEstado)===8;}).length;
+  var vals=allData.filter(function(l){return parseInt(l.CodigoEstado)===8&&l.MontoEstimado;}).map(function(l){return parseFloat(l.MontoEstimado);});
+  $('stAvg').textContent=vals.length?fmtCLP(vals.reduce(function(a,b){return a+b;},0)/vals.length):'—';
+}
+
+function selectRow(idx){
+  var l=filtered[idx];if(!l)return;
+  selectedCode=l.CodigoExterno;
+  document.querySelectorAll('tbody tr').forEach(function(tr){tr.classList.remove('selected');});
+  var r=$('row-'+idx);if(r)r.classList.add('selected');
+  renderDetail(l);
+}
+
+function renderDetail(l){
+  var si=statusInfo(l.CodigoEstado),slabel=si[0],scls=si[1];
+  var org=l.Organismo?l.Organismo.NombreOrganismo:'—';
+  var mpUrl='https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion='+l.CodigoExterno;
+  var provs=l.Adjudicacion?l.Adjudicacion.Proveedor||[]:[];
+  var adjHtml=provs.length>0?provs.map(function(p){return '<div class="winner-box"><div class="winner-name">🏆 '+(p.NombreProveedor||'—')+'</div>'+(p.RutProveedor?'<div class="winner-meta">RUT: '+p.RutProveedor+'</div>':'')+(p.montoTotalAdjudicado?'<div class="winner-meta" style="color:var(--accent)">Adj: '+fmtCLP(p.montoTotalAdjudicado)+' CLP</div>':'')+'</div>';}).join(''):'<div style="font-family:var(--mono);font-size:.66rem;color:var(--muted);text-align:center;padding:.4rem 0">Sin adjudicación registrada</div>';
+  var pNombre=provs[0]?provs[0].NombreProveedor:'';
+  $('detailPanel').innerHTML='<div class="d-header"><div class="d-header-top"><span class="d-id">'+(l.CodigoExterno||'—')+'</span><span class="badge '+scls+'">'+slabel+'</span></div><div class="d-title">'+(l.Nombre||'Sin nombre')+'</div></div><div class="d-body"><div><div class="d-st">General</div><div class="kv"><span class="kv-k">Organismo</span><span class="kv-v">'+org+'</span></div><div class="kv"><span class="kv-k">Tipo</span><span class="kv-v">'+(l.Tipo||'—')+'</span></div><div class="kv"><span class="kv-k">Monto estimado</span><span class="kv-v o">'+fmtCLP(l.MontoEstimado)+' '+(l.UnidadMoneda||'CLP')+'</span></div><div class="kv"><span class="kv-k">Publicación</span><span class="kv-v">'+fmtDateL(l.FechaPublicacion)+'</span></div><div class="kv"><span class="kv-k">Cierre</span><span class="kv-v">'+fmtDateL(l.FechaCierre)+'</span></div><div class="kv"><span class="kv-k">Región</span><span class="kv-v">'+(l.Organismo?l.Organismo.RegionOrganismo||'—':'—')+'</span></div></div>'+(l.Descripcion?'<div><div class="d-st">Descripción</div><div class="d-desc">'+l.Descripcion+'</div></div>':'')+'<div><div class="d-st">Adjudicación</div>'+adjHtml+'</div><div><a href="'+mpUrl+'" target="_blank" class="abtn p">Ver en Mercado Público ↗</a><button onclick="filterBy(\''+org.replace(/['"]/g,'').substring(0,50)+'\')" class="abtn">Todas de este organismo</button>'+(pNombre?'<button onclick="filterBy(\''+pNombre.replace(/['"]/g,'').substring(0,40)+'\')" class="abtn">Otras adj. de este proveedor</button>':'')+'</div></div>';
+}
+
+function filterBy(q){$('filterInput').value=q;applyFilters();}
+
+function sortBy(field){
+  if(sortField===field)sortDir*=-1;else{sortField=field;sortDir=-1;}
+  document.querySelectorAll('[id^="sort-"]').forEach(function(el){el.textContent='';});
+  $('sort-'+field).textContent=sortDir===-1?' ↓':' ↑';
+  document.querySelectorAll('th').forEach(function(th){th.classList.remove('sorted');});
+  var th=$('th-'+field);if(th)th.classList.add('sorted');
+  applyFilters();
+}
+
+function setMode(btn){document.querySelectorAll('[data-mode]').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');loadMode=btn.dataset.mode;if(ticket)loadData();}
+function setStatus(btn){document.querySelectorAll('.sf-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');statusFilter=btn.dataset.s;applyFilters();}
+
+function toggleAuto(){autoOn=!autoOn;$('autoBtn').classList.toggle('on',autoOn);if(autoOn)scheduleAuto();else{clearTimeout(autoTimer);clearInterval(cdTimer);$('sbCd').textContent='—';}}
+function scheduleAuto(){clearTimeout(autoTimer);clearInterval(cdTimer);if(!autoOn||!ticket)return;cdSecs=AUTO_MS/1000;tickCd();cdTimer=setInterval(function(){cdSecs--;tickCd();if(cdSecs<=0)clearInterval(cdTimer);},1000);autoTimer=setTimeout(loadData,AUTO_MS);}
+function tickCd(){var m=Math.floor(cdSecs/60),s=cdSecs%60;$('sbCd').textContent=m+':'+String(s).padStart(2,'0');}
+
+$('sort-FechaPublicacion').textContent=' ↓';
+$('th-FechaPublicacion').classList.add('sorted');
+try{var saved=localStorage.getItem('mp_ticket');if(saved)$('ticketInput').value=saved;}catch(e){}
+$('ticketInput').addEventListener('keydown',function(e){if(e.key==='Enter')cargar();});
+</script>
+</body>
+</html>
