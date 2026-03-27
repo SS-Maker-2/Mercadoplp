@@ -3,760 +3,1023 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MP Intel</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Licitando — Panel Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0a0a0a; --bg2:#111; --surface:#161616; --surface2:#1c1c1c; --surface3:#222;
-  --border:#2a2a2a; --border2:#333;
-  --green:#00c896; --green-dim:rgba(0,200,150,.2); --green-lo:rgba(0,200,150,.07);
-  --white:#f0f0f0; --g1:#aaa; --g2:#666; --g3:#333;
-  --red:#e05555; --amber:#d4922a; --blue:#6ab0f5;
-  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+:root{
+  --bg:#080a10;--bg2:#0e1018;--bg3:#141720;--bg4:#1b1f2e;--bg5:#222738;
+  --border:#1e2336;--border2:#283048;
+  --blue:#3b82f6;--blue2:#2563eb;--cyan:#06b6d4;--green:#10b981;
+  --orange:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--pink:#ec4899;
+  --text:#e2e8f8;--text2:#6b7899;--text3:#363d55;
+  --mono:'IBM Plex Mono',monospace;--display:'Syne',sans-serif;--body:'Epilogue',sans-serif;
+  --r:10px;
 }
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;}
-body{background:var(--bg);color:var(--white);font-family:var(--sans);font-size:14px;overflow:hidden;}
-::-webkit-scrollbar{width:3px;height:3px;}
-::-webkit-scrollbar-thumb{background:var(--border2);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);display:flex;min-height:100vh;overflow-x:hidden}
 
-.view{display:none;flex-direction:column;height:100vh;overflow:hidden;}
-.view.active{display:flex;}
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.25rem 0.75rem;gap:0.1rem;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:0.65rem;padding:0.5rem 0.75rem;margin-bottom:1rem}
+.brand-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:0.8rem;font-weight:800;color:#fff;flex-shrink:0}
+.brand-name{font-family:var(--display);font-size:1.05rem;font-weight:800;letter-spacing:-0.02em}
+.brand-name span{color:var(--cyan)}
+.brand-status{font-size:0.58rem;color:var(--green);font-family:var(--mono);display:flex;align-items:center;gap:0.3rem;margin-top:1px}
+.pulse{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.nav-sec{font-family:var(--mono);font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text3);padding:0.9rem 0.75rem 0.3rem}
+.ni{display:flex;align-items:center;gap:0.6rem;padding:0.52rem 0.75rem;border-radius:8px;font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all 0.15s;border:none;background:transparent;width:100%;text-align:left}
+.ni:hover{background:var(--bg3);color:var(--text)}
+.ni.active{background:rgba(59,130,246,0.1);color:var(--blue)}
+.ni-icon{width:15px;text-align:center;font-size:0.8rem;flex-shrink:0}
+.nb{margin-left:auto;font-size:0.55rem;font-family:var(--mono);padding:0.1rem 0.4rem;border-radius:8px;font-weight:700}
+.nb.blue{background:var(--blue);color:#fff}
+.nb.orange{background:var(--orange);color:#000}
+.nb.red{background:var(--red);color:#fff}
+.nb.green{background:var(--green);color:#000}
+.nb.purple{background:var(--purple);color:#fff}
+.sf{margin-top:auto;border-top:1px solid var(--border);padding-top:0.75rem}
+.uc{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.75rem;border-radius:8px;cursor:pointer}
+.uc:hover{background:var(--bg3)}
+.ua{width:30px;height:30px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0}
 
-/* TOPBAR */
-.topbar{flex-shrink:0;height:54px;background:var(--bg);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 24px;gap:16px;position:relative;z-index:50;}
-.logo{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green);
-  letter-spacing:.08em;display:flex;align-items:center;gap:8px;white-space:nowrap;}
-.logo::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);
-  animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,200,150,.5)}50%{box-shadow:0 0 0 5px rgba(0,200,150,0)}}
-.ticket-zone{flex:1;max-width:480px;display:flex;align-items:center;
-  border:1px solid var(--border2);background:var(--surface);}
-.t-lbl{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;
-  letter-spacing:.1em;padding:0 10px;border-right:1px solid var(--border);white-space:nowrap;}
-.t-inp{flex:1;background:transparent;border:none;outline:none;color:var(--white);
-  font-family:var(--mono);font-size:11px;padding:10px 12px;}
-.t-inp::placeholder{color:var(--g3);}
-.t-demo{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;
-  padding:0 10px;height:100%;border:none;border-left:1px solid var(--border);
-  background:transparent;color:var(--g2);cursor:pointer;transition:color .15s;white-space:nowrap;}
-.t-demo:hover{color:var(--white);}
-.t-go{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
-  letter-spacing:.06em;padding:11px 18px;border:none;background:var(--green);color:#000;
-  cursor:pointer;transition:opacity .15s;white-space:nowrap;}
-.t-go:hover{opacity:.85;}
-.t-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-.t-time{font-family:var(--mono);font-size:10px;color:var(--g2);}
-.cd{font-family:var(--mono);font-size:10px;color:var(--g2);border:1px solid var(--border);
-  padding:5px 10px;display:none;}
-.cd span{color:var(--green);}
-.btn-r{width:32px;height:32px;border:1px solid var(--border2);background:transparent;
-  color:var(--g2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;}
-.btn-r:hover{border-color:var(--green);color:var(--green);}
-.btn-r.spin{animation:spin .6s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* MAIN */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{border-bottom:1px solid var(--border);padding:0.85rem 1.75rem;display:flex;align-items:center;justify-content:space-between;background:rgba(8,10,16,0.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50}
+.pt{font-family:var(--display);font-size:1rem;font-weight:700}
+.ps{font-size:0.7rem;color:var(--text2);margin-top:1px}
+.tr{display:flex;align-items:center;gap:0.65rem}
+.btn{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:0.38rem 0.85rem;color:var(--text2);font-family:var(--body);font-size:0.76rem;cursor:pointer;transition:all 0.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.p:hover{background:var(--blue2)}
+.btn.d{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red)}
+.btn.g{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green)}
+.ptabs{display:flex;gap:0.15rem;background:var(--bg3);border-radius:7px;padding:3px}
+.pt2{font-size:0.68rem;padding:0.25rem 0.65rem;border-radius:5px;cursor:pointer;color:var(--text2);border:none;background:transparent;font-family:var(--body)}
+.pt2.active{background:var(--bg4);color:var(--text)}
+.nbell{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:7px;width:33px;height:33px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.82rem}
+.ndot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
 
-/* STATS */
-.statsbar{flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);
-  border-bottom:1px solid var(--border);}
-.sc{padding:11px 20px;border-right:1px solid var(--border);position:relative;overflow:hidden;}
-.sc:last-child{border-right:none;}
-.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc-c,var(--green));}
-.sc-l{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
-.sc-v{font-family:var(--mono);font-size:21px;font-weight:500;color:var(--sc-c,var(--white));line-height:1;}
-.sc-s{font-family:var(--mono);font-size:9px;color:var(--g3);margin-top:3px;}
+/* CONTENT */
+.content{padding:1.35rem 1.75rem;display:flex;flex-direction:column;gap:1.1rem;overflow-y:auto;max-height:calc(100vh - 60px)}
+.sec{display:none;flex-direction:column;gap:1.1rem}
+.sec.active{display:flex}
 
-/* TABS */
-.tabs{flex-shrink:0;display:flex;padding:0 24px;background:var(--bg);
-  border-bottom:1px solid var(--border);}
-.tab{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;
-  padding:12px 16px;border:none;border-bottom:2px solid transparent;background:transparent;
-  color:var(--g2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;
-  position:relative;top:1px;}
-.tab:hover{color:var(--white);}
-.tab.active{color:var(--white);border-bottom-color:var(--green);}
-.tab-n{font-size:9px;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--g2);min-width:20px;text-align:center;}
-.tab.active .tab-n{background:var(--green);color:#000;}
-
-/* TOOLBAR */
-.toolbar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 24px;
-  background:var(--surface);border-bottom:1px solid var(--border);}
-.srch{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--border2);
-  background:var(--bg2);padding:0 12px;}
-.srch svg{color:var(--g2);flex-shrink:0;}
-.srch input{flex:1;background:transparent;border:none;outline:none;font-family:var(--sans);
-  font-size:12px;color:var(--white);padding:8px 0;}
-.srch input::placeholder{color:var(--g3);}
-.sort-sel{background:var(--bg2);border:1px solid var(--border2);color:var(--g1);
-  font-family:var(--mono);font-size:10px;padding:8px 10px;outline:none;cursor:pointer;}
-.sort-sel option{background:var(--surface);}
-.r-count{font-family:var(--mono);font-size:10px;color:var(--g2);white-space:nowrap;}
-/* loading bar for adj days */
-.days-notice{font-family:var(--mono);font-size:10px;color:var(--g2);
-  background:var(--surface2);border:1px solid var(--border);padding:4px 10px;white-space:nowrap;}
-
-/* TABLE */
-.tbl-scroll{flex:1;overflow-y:auto;}
-table{width:100%;border-collapse:collapse;}
-thead{position:sticky;top:0;z-index:10;background:var(--surface2);}
-th{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;
-  letter-spacing:.1em;padding:10px 20px;text-align:left;border-bottom:1px solid var(--border);
-  white-space:nowrap;font-weight:400;}
-th:last-child{text-align:right;}
-tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
-tbody tr:hover td{background:var(--surface);}
-tbody tr:hover td:first-child{border-left:2px solid var(--green);padding-left:18px;}
-@keyframes rowIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.new-row td{animation:rowIn .3s ease-out;}
-td{padding:12px 20px;vertical-align:middle;transition:background .1s;}
-.td-code{font-family:var(--mono);font-size:10px;color:var(--g2);white-space:nowrap;}
-.td-nm{font-size:12px;font-weight:500;line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
-.td-org{font-size:11px;color:var(--g2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;}
-.td-amt{font-family:var(--mono);font-size:11px;color:var(--amber);text-align:right;white-space:nowrap;}
-.td-dt{font-family:var(--mono);font-size:10px;color:var(--g2);white-space:nowrap;}
-.badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;
-  letter-spacing:.04em;padding:3px 8px;white-space:nowrap;}
-.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
-.b-act{color:var(--green);background:var(--green-lo);border:1px solid var(--green-dim);}
-.b-adj{color:var(--blue);background:rgba(106,176,245,.07);border:1px solid rgba(106,176,245,.2);}
-.b-cer{color:var(--g2);background:rgba(100,100,100,.06);border:1px solid var(--border2);}
-.b-des{color:var(--red);background:rgba(224,85,85,.06);border:1px solid rgba(224,85,85,.2);}
-
-/* PAGER */
-.pager{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-  padding:10px 24px;background:var(--surface);border-top:1px solid var(--border);
-  font-family:var(--mono);font-size:10px;color:var(--g2);}
-.pg-btn{font-family:var(--mono);font-size:10px;padding:6px 14px;border:1px solid var(--border2);
-  background:transparent;color:var(--g2);cursor:pointer;transition:all .15s;}
-.pg-btn:hover:not(:disabled){border-color:var(--green);color:var(--green);}
-.pg-btn:disabled{opacity:.3;cursor:not-allowed;}
-
-/* EMPTY */
-.empty{padding:80px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;}
-.empty-i{font-size:28px;opacity:.15;}
-.empty-t{font-size:13px;font-weight:600;color:var(--g1);}
-.empty-s{font-family:var(--mono);font-size:11px;color:var(--g2);line-height:1.6;}
-
-/* ── DETAIL VIEW ────────────────────────── */
-.d-back{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;
-  padding:8px 14px;border:1px solid var(--border2);background:transparent;color:var(--g2);
-  cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;}
-.d-back:hover{border-color:var(--green);color:var(--green);}
-.d-scroll{flex:1;overflow-y:auto;}
-.d-inner{max-width:920px;margin:0 auto;padding:40px 32px;}
-
-.d-eyebrow{font-family:var(--mono);font-size:10px;color:var(--g2);text-transform:uppercase;
-  letter-spacing:.1em;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.d-eyebrow::after{content:'';flex:1;height:1px;background:var(--border);}
-.d-title{font-size:22px;font-weight:700;line-height:1.35;margin-bottom:6px;}
-.d-org{font-size:14px;color:var(--g1);margin-bottom:18px;}
-.d-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
-
-/* loading state for detail */
-.d-loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 20px;text-align:center;}
-.d-spinner{width:28px;height:28px;border:1px solid var(--border2);border-top-color:var(--green);
-  border-radius:50%;animation:spin .7s linear infinite;}
-.d-load-t{font-family:var(--mono);font-size:11px;color:var(--g2);}
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ch{padding:1rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
+.ct{font-family:var(--display);font-size:0.86rem;font-weight:600}
+.cs{font-size:0.68rem;color:var(--text2);margin-top:1px}
+.cb{padding:1.3rem}
 
 /* GRID */
-.d-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
-.d-grid.full{grid-template-columns:1fr;}
-@media(max-width:680px){.d-grid{grid-template-columns:1fr;}}
-.card{background:var(--surface);border:1px solid var(--border);padding:20px 22px;}
-.card-title{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;
-  letter-spacing:.12em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:8px;}
-.card-title::before{content:'';width:3px;height:11px;background:var(--ct-c,var(--green));flex-shrink:0;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+.g21{display:grid;grid-template-columns:1fr 300px;gap:0.75rem}
+.g12{display:grid;grid-template-columns:300px 1fr;gap:0.75rem}
 
-/* KV */
-.kv{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;gap:16px;}
-.kv+.kv{border-top:1px solid var(--border);}
-.kv-k{font-family:var(--mono);font-size:10px;color:var(--g2);flex-shrink:0;}
-.kv-v{font-family:var(--mono);font-size:11px;color:var(--white);text-align:right;word-break:break-word;}
-.kv-v.money{color:var(--amber);font-size:13px;font-weight:500;}
-.kv-v.green{color:var(--green);}
-.kv-v.muted{color:var(--g2);}
+/* METRICS */
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem;position:relative;overflow:hidden;animation:fadeUp 0.4s ease both}
+.metric::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.metric.blue::after{background:var(--blue)}
+.metric.green::after{background:var(--green)}
+.metric.orange::after{background:var(--orange)}
+.metric.purple::after{background:var(--purple)}
+.metric.cyan::after{background:var(--cyan)}
+.metric.red::after{background:var(--red)}
+.metric.pink::after{background:var(--pink)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.metric:nth-child(1){animation-delay:.04s}
+.metric:nth-child(2){animation-delay:.08s}
+.metric:nth-child(3){animation-delay:.12s}
+.metric:nth-child(4){animation-delay:.16s}
+.ml{font-size:0.66rem;color:var(--text2);margin-bottom:0.4rem}
+.mv{font-family:var(--display);font-size:1.65rem;font-weight:700;line-height:1;margin-bottom:0.35rem}
+.mv.blue{color:var(--blue)}
+.mv.green{color:var(--green)}
+.mv.orange{color:var(--orange)}
+.mv.purple{color:var(--purple)}
+.mv.cyan{color:var(--cyan)}
+.mv.red{color:var(--red)}
+.mv.pink{color:var(--pink)}
+.mc{font-family:var(--mono);font-size:0.62rem;padding:0.12rem 0.38rem;border-radius:4px;display:inline-block}
+.mc.up{background:rgba(16,185,129,0.1);color:var(--green)}
+.mc.dn{background:rgba(239,68,68,0.1);color:var(--red)}
+.mcp{font-size:0.62rem;color:var(--text3);margin-left:0.35rem}
 
-/* TIMELINE */
-.tl-row{display:flex;align-items:center;gap:12px;padding:8px 0;}
-.tl-row+.tl-row{border-top:1px solid var(--border);}
-.tl-ico{width:28px;height:28px;flex-shrink:0;border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;font-size:12px;}
-.tl-row.past .tl-ico{border-color:var(--green);background:var(--green-lo);}
-.tl-info{flex:1;}
-.tl-l{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;letter-spacing:.08em;}
-.tl-d{font-family:var(--mono);font-size:12px;color:var(--white);margin-top:2px;}
-.tl-row.past .tl-d{color:var(--green);}
-.tl-tag{font-family:var(--mono);font-size:8px;padding:2px 6px;
-  background:var(--green-lo);color:var(--green);border:1px solid var(--green-dim);}
+/* TAGS */
+.tag{font-size:0.58rem;padding:0.12rem 0.45rem;border-radius:10px;font-family:var(--mono)}
+.tag.lp{background:rgba(239,68,68,0.1);color:var(--red)}
+.tag.agil{background:rgba(139,92,246,0.1);color:var(--purple)}
+.tag.cot{background:rgba(6,182,212,0.1);color:var(--cyan)}
+.tag.nueva{background:rgba(59,130,246,0.1);color:var(--blue)}
+.tag.post{background:rgba(59,130,246,0.1);color:var(--blue)}
+.tag.gan{background:rgba(16,185,129,0.1);color:var(--green)}
+.tag.per{background:rgba(239,68,68,0.1);color:var(--red)}
+.tag.eval{background:rgba(245,158,11,0.1);color:var(--orange)}
+.tag.etiq{background:var(--bg4);color:var(--text2);border:1px solid var(--border2)}
+.tag.pa{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.tag.pm{background:rgba(245,158,11,0.1);color:var(--orange);border:1px solid rgba(245,158,11,0.2)}
+.tag.pb{background:rgba(59,130,246,0.1);color:var(--blue);border:1px solid rgba(59,130,246,0.2)}
 
-/* WINNER */
-.win-box{border:1px solid var(--green-dim);background:var(--green-lo);padding:16px 18px;margin-bottom:8px;}
-.win-label{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;}
-.win-name{font-size:15px;font-weight:700;color:var(--green);margin-bottom:3px;}
-.win-rut{font-family:var(--mono);font-size:10px;color:var(--g2);}
-.win-amt-wrap{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
-.win-amt-l{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.win-amt-v{font-family:var(--mono);font-size:24px;font-weight:500;color:var(--amber);}
-.no-adj{font-family:var(--mono);font-size:11px;color:var(--g2);padding:12px;
-  background:var(--surface2);border:1px solid var(--border);text-align:center;}
+/* LICITACIONES */
+.lf{display:flex;align-items:center;gap:0.5rem;padding:0.85rem 1.3rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.sw{flex:1;min-width:160px;position:relative}
+.sw input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:0.4rem 0.7rem 0.4rem 1.9rem;color:var(--text);font-family:var(--body);font-size:0.78rem;outline:none;transition:border 0.15s}
+.sw input:focus{border-color:var(--blue)}
+.sw input::placeholder{color:var(--text3)}
+.si{position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:0.78rem}
+.pill{font-size:0.7rem;padding:0.28rem 0.75rem;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:var(--body)}
+.pill:hover,.pill.active{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,0.08)}
+.ll{display:flex;flex-direction:column}
+.li{padding:0.9rem 1.3rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:4px 1fr auto;gap:0.75rem;align-items:start;transition:background 0.15s;cursor:pointer}
+.li:last-child{border:none}
+.li:hover{background:var(--bg3)}
+.prio{border-radius:4px;align-self:stretch;min-height:60px;flex-shrink:0}
+.prio.a{background:var(--red)}
+.prio.m{background:var(--orange)}
+.prio.b{background:var(--blue)}
+.lc{font-family:var(--mono);font-size:0.58rem;color:var(--text3);margin-bottom:0.2rem;display:flex;align-items:center;gap:0.4rem}
+.ln{font-size:0.83rem;font-weight:500;margin-bottom:0.25rem;line-height:1.4}
+.lo{font-size:0.7rem;color:var(--text2);margin-bottom:0.35rem}
+.ltags{display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.35rem}
+.lacts{display:flex;gap:0.3rem;flex-wrap:wrap}
+.ab{font-size:0.6rem;padding:0.18rem 0.48rem;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:var(--body)}
+.ab:hover{border-color:var(--blue);color:var(--blue)}
+.ab.p{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.25);color:var(--blue)}
+.lr{display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;min-width:110px}
+.lm{font-family:var(--mono);font-size:0.88rem;font-weight:700;color:var(--green)}
+.lcl{font-size:0.65rem;color:var(--text2);font-family:var(--mono);text-align:right}
+.lcl.u{color:var(--red)}
+.lcl.p{color:var(--orange)}
+.of{font-size:0.62rem;color:var(--text3);font-family:var(--mono)}
 
-/* DESCRIPTION */
-.desc-box{font-family:var(--mono);font-size:11px;color:var(--g1);line-height:1.75;
-  background:var(--bg2);border:1px solid var(--border);padding:14px 16px;
-  max-height:150px;overflow-y:auto;}
+/* CIERRES */
+.ci{padding:0.8rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem}
+.ci:last-child{border:none}
+.cd{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.68rem;font-weight:700;flex-shrink:0}
+.cd.u{background:rgba(239,68,68,0.1);color:var(--red)}
+.cd.p{background:rgba(245,158,11,0.1);color:var(--orange)}
+.cd.n{background:rgba(59,130,246,0.1);color:var(--blue)}
+.cn{font-size:0.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.co{font-size:0.65rem;color:var(--text2);margin-top:1px}
+.cm{font-family:var(--mono);font-size:0.65rem;color:var(--green);margin-top:2px}
 
-/* ACTIONS */
-.act-row{display:flex;gap:10px;flex-wrap:wrap;}
-.abtn{flex:1;min-width:150px;padding:11px 14px;font-family:var(--mono);font-size:11px;
-  font-weight:500;letter-spacing:.04em;border:none;cursor:pointer;text-align:center;
-  text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
-.abtn-p{background:var(--green);color:#000;}
-.abtn-p:hover{opacity:.85;}
-.abtn-g{background:var(--surface2);border:1px solid var(--border2);color:var(--g1);}
-.abtn-g:hover{border-color:var(--green);color:var(--green);}
+/* FINANCIERO */
+.fi{padding:0.85rem 1.3rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto auto auto;gap:1rem;align-items:center}
+.fi:last-child{border:none}
+.fi:hover{background:var(--bg3)}
+.fn{font-size:0.8rem;font-weight:500}
+.fo{font-size:0.67rem;color:var(--text2);margin-top:2px}
+.fbar{width:100%;height:4px;background:var(--bg4);border-radius:3px;margin-top:0.4rem}
+.fbar-fill{height:100%;border-radius:3px}
+.fval{font-family:var(--mono);font-size:0.75rem;font-weight:600;text-align:right}
+.fval.green{color:var(--green)}
+.fval.orange{color:var(--orange)}
+.fval.blue{color:var(--blue)}
 
-/* OVERLAY */
-.overlay{position:fixed;inset:0;background:rgba(10,10,10,.9);backdrop-filter:blur(6px);
-  z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:16px;text-align:center;}
-.overlay.hidden{display:none;}
-.ov-sp{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);
-  border-top-color:var(--green);animation:spin .7s linear infinite;}
-.ov-t{font-size:15px;font-weight:600;}
-.ov-s{font-family:var(--mono);font-size:11px;color:var(--g2);}
-.ov-bar{width:220px;height:1px;background:var(--border);}
-.ov-fill{height:100%;background:var(--green);transition:width .4s;width:0%;}
-.ov-err-ico{font-size:32px;}
-.ov-err-t{font-size:14px;font-weight:600;color:var(--red);margin-top:4px;}
-.ov-err-m{font-family:var(--mono);font-size:11px;color:var(--g2);line-height:1.8;max-width:340px;}
-.ov-err-m a{color:var(--green);}
-.ov-btn{font-family:var(--mono);font-size:11px;padding:10px 24px;border:1px solid var(--green);
-  background:transparent;color:var(--green);cursor:pointer;margin-top:4px;letter-spacing:.05em;}
-.ov-btn:hover{background:var(--green-lo);}
+/* OC */
+.oc-item{padding:0.85rem 1.3rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto auto;gap:1rem;align-items:center}
+.oc-item:last-child{border:none}
+.oc-item:hover{background:var(--bg3)}
+.oc-num{font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-bottom:0.15rem}
+.oc-nombre{font-size:0.8rem;font-weight:500}
+.oc-org{font-size:0.67rem;color:var(--text2);margin-top:2px}
+.oc-estado{font-size:0.62rem;padding:0.15rem 0.5rem;border-radius:10px;font-family:var(--mono)}
+.oc-estado.pend{background:rgba(245,158,11,0.1);color:var(--orange)}
+.oc-estado.pag{background:rgba(16,185,129,0.1);color:var(--green)}
+.oc-estado.proc{background:rgba(59,130,246,0.1);color:var(--blue)}
 
-/* WELCOME */
-#welcome{position:fixed;inset:0;background:var(--bg);z-index:300;
-  display:flex;align-items:center;justify-content:center;}
-#welcome.hidden{display:none;}
-.wc{width:100%;max-width:400px;padding:44px 38px;background:var(--surface);border:1px solid var(--border2);}
-.wc-logo{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--green);letter-spacing:.05em;margin-bottom:6px;}
-.wc-sub{font-size:13px;color:var(--g2);line-height:1.6;margin-bottom:28px;}
-.wc-lbl{font-family:var(--mono);font-size:9px;color:var(--g2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;}
-.wc-inp{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--white);
-  font-family:var(--mono);font-size:12px;padding:12px 14px;outline:none;margin-bottom:8px;transition:border-color .2s;}
-.wc-inp:focus{border-color:var(--green);}
-.wc-btn{width:100%;padding:13px;font-family:var(--mono);font-size:11px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.06em;border:none;background:var(--green);color:#000;
-  cursor:pointer;margin-bottom:8px;transition:opacity .15s;}
-.wc-btn:hover{opacity:.85;}
-.wc-btn2{width:100%;padding:12px;font-family:var(--mono);font-size:11px;text-transform:uppercase;
-  letter-spacing:.06em;border:1px solid var(--border2);background:transparent;color:var(--g2);cursor:pointer;transition:all .15s;}
-.wc-btn2:hover{border-color:var(--white);color:var(--white);}
-.wc-lnk{display:block;text-align:center;margin-top:18px;font-family:var(--mono);font-size:10px;}
-.wc-lnk a{color:var(--g2);text-decoration:none;}
-.wc-lnk a:hover{color:var(--green);}
+/* CALENDARIO */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.cal-day-name{font-family:var(--mono);font-size:0.6rem;color:var(--text3);text-align:center;padding:0.3rem 0}
+.cal-day{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.4rem;min-height:60px;cursor:pointer;transition:all 0.15s;position:relative}
+.cal-day:hover{border-color:var(--blue)}
+.cal-day.today{border-color:var(--blue);background:rgba(59,130,246,0.05)}
+.cal-day.has-event{border-color:rgba(239,68,68,0.3)}
+.cal-num{font-family:var(--mono);font-size:0.65rem;color:var(--text2);margin-bottom:0.2rem}
+.cal-num.today{color:var(--blue);font-weight:700}
+.cal-event{font-size:0.5rem;padding:0.08rem 0.25rem;border-radius:3px;margin-bottom:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+.cal-event.red{background:rgba(239,68,68,0.15);color:var(--red)}
+.cal-event.orange{background:rgba(245,158,11,0.15);color:var(--orange)}
+.cal-event.blue{background:rgba(59,130,246,0.15);color:var(--blue)}
+.cal-event.green{background:rgba(16,185,129,0.15);color:var(--green)}
+.cal-empty{background:transparent;border:1px solid transparent;min-height:60px}
 
-@media(max-width:900px){
-  .statsbar{grid-template-columns:repeat(3,1fr);}
-  .sc:nth-child(4),.sc:nth-child(5){display:none;}
-}
+/* PRESUPUESTOS */
+.pres-item{padding:0.85rem 1.3rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto auto auto;gap:1rem;align-items:center}
+.pres-item:last-child{border:none}
+.pres-item:hover{background:var(--bg3)}
+.pres-num{font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-bottom:0.15rem}
+.pres-nombre{font-size:0.8rem;font-weight:500}
+.pres-fecha{font-size:0.65rem;color:var(--text2);margin-top:2px;font-family:var(--mono)}
+.pres-estado{font-size:0.62rem;padding:0.15rem 0.5rem;border-radius:10px;font-family:var(--mono)}
+.pres-estado.env{background:rgba(59,130,246,0.1);color:var(--blue)}
+.pres-estado.apr{background:rgba(16,185,129,0.1);color:var(--green)}
+.pres-estado.bor{background:var(--bg4);color:var(--text2)}
+.pres-estado.rec{background:rgba(239,68,68,0.1);color:var(--red)}
+
+/* ALERTAS */
+.ai{padding:0.85rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:0.7rem}
+.ai:last-child{border:none}
+.aico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.aico.ok{background:rgba(16,185,129,0.1)}
+.aico.fail{background:rgba(239,68,68,0.1)}
+.an{font-size:0.78rem;font-weight:500}
+.am{font-size:0.65rem;color:var(--text2);margin-top:2px;font-family:var(--mono)}
+.ac{font-size:0.58rem;padding:0.1rem 0.38rem;border-radius:4px;background:rgba(37,211,102,0.1);color:#25d366;margin-left:0.4rem}
+.ac.fail{background:rgba(239,68,68,0.1);color:var(--red)}
+
+/* WSP PREVIEW */
+.wsp{background:#0b1a13;border:1px solid #1a3a2a;border-radius:12px;padding:1rem 1.1rem;font-family:var(--mono);font-size:0.75rem;line-height:1.8;color:#e2f5ea;position:relative}
+.wsp::before{content:'WhatsApp Preview';position:absolute;top:0.5rem;right:0.75rem;font-size:0.52rem;color:#2d6a4f;letter-spacing:0.08em}
+.wb{font-weight:700;color:#25d366}
+.wg{color:#25d366}
+
+/* IA */
+.iac{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:0.8rem;cursor:pointer;transition:all 0.15s;margin-bottom:0.5rem}
+.iac:hover{border-color:var(--blue);background:rgba(59,130,246,0.05)}
+.iac:last-child{margin-bottom:0}
+.ian{font-size:0.78rem;font-weight:500;margin-bottom:0.18rem}
+.iad{font-size:0.65rem;color:var(--text2)}
+
+/* CONFIG */
+.cr{display:flex;align-items:center;justify-content:space-between;padding:0.55rem 0;border-bottom:1px solid var(--border)}
+.cr:last-child{border:none}
+.crl{font-size:0.76rem}
+.crs{font-size:0.62rem;color:var(--text2);margin-top:1px}
+.ci2{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.38rem 0.65rem;color:var(--text);font-family:var(--mono);font-size:0.72rem;outline:none}
+.ci2:focus{border-color:var(--blue)}
+.toggle{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+.toggle input{display:none}
+.tt{position:absolute;inset:0;background:var(--bg5);border-radius:10px;transition:background 0.2s}
+.toggle input:checked+.tt{background:var(--blue)}
+.th{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform 0.2s}
+.toggle input:checked~.th{transform:translateX(16px)}
+.kwtag{font-family:var(--mono);font-size:0.62rem;padding:0.18rem 0.55rem;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:0.25rem;margin:0.15rem}
+.kwtag.inc{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:var(--blue)}
+.kwtag.exc{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
+.kwin{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.38rem 0.65rem;color:var(--text);font-family:var(--mono);font-size:0.72rem;outline:none}
+.kwin:focus{border-color:var(--blue)}
+.sct{font-family:var(--display);font-size:0.8rem;font-weight:600;color:var(--text2);padding-bottom:0.4rem;border-bottom:1px solid var(--border);margin-bottom:0.65rem}
+
+/* USUARIOS */
+.ut{width:100%;border-collapse:collapse}
+.ut th{padding:0.6rem 1.3rem;text-align:left;font-size:0.6rem;color:var(--text3);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.ut td{padding:0.8rem 1.3rem;border-bottom:1px solid var(--border);font-size:0.78rem}
+.ut tr:last-child td{border:none}
+.uas{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:#fff;flex-shrink:0}
+.rb{font-size:0.62rem;padding:0.18rem 0.48rem;border-radius:4px;font-family:var(--mono)}
+.rb.admin{background:rgba(59,130,246,0.1);color:var(--blue)}
+.rb.user{background:rgba(16,185,129,0.1);color:var(--green)}
+.rb.ro{background:var(--bg4);color:var(--text2)}
+
+/* CHART */
+.chart-svg{width:100%;height:170px}
+.chl{display:flex;justify-content:space-between;margin-top:0.5rem}
+.chll{font-size:0.6rem;color:var(--text3);font-family:var(--mono)}
+.leg{display:flex;gap:1rem;margin-top:0.65rem}
+.legi{display:flex;align-items:center;gap:0.35rem;font-size:0.68rem;color:var(--text2)}
+.legd{width:7px;height:7px;border-radius:50%}
+.dw{display:flex;align-items:center;justify-content:center;position:relative;padding:0.5rem 0}
+.dc{position:absolute;text-align:center}
+.dp{font-family:var(--display);font-size:1.4rem;font-weight:700;color:var(--green);line-height:1}
+.dl2{font-size:0.58rem;color:var(--text2)}
+.dlr{display:flex;flex-direction:column;gap:0.45rem;padding:0 1.3rem 1.3rem}
+.dlrow{display:flex;align-items:center;gap:0.5rem}
+.dlc{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.dln{font-size:0.72rem;color:var(--text2);flex:1}
+.dlv{font-family:var(--mono);font-size:0.7rem;font-weight:500}
+
+/* LOG */
+.log{display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid var(--border);font-size:0.72rem;font-family:var(--mono)}
+.log:last-child{border:none}
+.logt{color:var(--text3);flex-shrink:0;font-size:0.62rem}
+.logok{color:var(--green)}
+.logw{color:var(--orange)}
+.loge{color:var(--red)}
+
+/* TOAST */
+.tw{position:fixed;bottom:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:0.45rem;z-index:999}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:0.6rem 0.9rem;display:flex;align-items:center;gap:0.55rem;min-width:240px;animation:tin 0.25s ease;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+@keyframes tin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+.tdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tmsg{font-size:0.75rem}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 </style>
 </head>
 <body>
 
-<!-- WELCOME -->
-<div id="welcome">
-  <div class="wc">
-    <div class="wc-logo">MP_INTEL</div>
-    <div class="wc-sub">Panel de inteligencia competitiva para Mercado Público Chile. Ingresa tu ticket API para comenzar.</div>
-    <div class="wc-lbl">Ticket API ChileCompra</div>
-    <input class="wc-inp" id="wTk" placeholder="Ej: F8537A18-6766-..." spellcheck="false" autocomplete="off">
-    <button class="wc-btn" onclick="doWelcome()">Conectar →</button>
-    <button class="wc-btn2" onclick="useDemo()">Usar ticket de prueba oficial</button>
-    <div class="wc-lnk"><a href="https://api.mercadopublico.cl/modules/Participa.aspx" target="_blank">Solicitar ticket gratuito ↗</a></div>
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-logo">L</div>
+    <div>
+      <div class="brand-name">Lici<span>tando</span></div>
+      <div class="brand-status"><span class="pulse"></span> Sistema activo · Modo PICO</div>
+    </div>
   </div>
-</div>
 
-<!-- OVERLAY -->
-<div class="overlay hidden" id="ov"></div>
+  <div class="nav-sec">Principal</div>
+  <button class="ni active" onclick="ir('dashboard',this)"><span class="ni-icon">⊞</span> Dashboard</button>
+  <button class="ni" onclick="ir('busqueda',this)"><span class="ni-icon">◎</span> Búsqueda <span class="nb blue">21</span></button>
+  <button class="ni" onclick="ir('seguimiento',this)"><span class="ni-icon">▷</span> Seguimiento <span class="nb orange">5</span></button>
+  <button class="ni" onclick="ir('cierres',this)"><span class="ni-icon">⏰</span> Próximos cierres <span class="nb red">3</span></button>
+  <button class="ni" onclick="ir('calendario',this)"><span class="ni-icon">📅</span> Calendario</button>
 
-<!-- ═══ VISTA LISTA ═══ -->
-<div class="view active" id="vList">
+  <div class="nav-sec">Financiero</div>
+  <button class="ni" onclick="ir('financiero',this)"><span class="ni-icon">💰</span> Finanzas <span class="nb green">↑</span></button>
+  <button class="ni" onclick="ir('oc',this)"><span class="ni-icon">📋</span> Órdenes de compra <span class="nb purple">4</span></button>
+  <button class="ni" onclick="ir('presupuestos',this)"><span class="ni-icon">📄</span> Presupuestos</button>
+
+  <div class="nav-sec">Gestión</div>
+  <button class="ni" onclick="ir('alertas',this)"><span class="ni-icon">📱</span> Historial alertas <span class="nb green">7</span></button>
+  <button class="ni" onclick="ir('decjurada',this)"><span class="ni-icon">✍</span> Decl. Jurada</button>
+
+  <div class="nav-sec">Inteligencia</div>
+  <button class="ni" onclick="ir('ia',this)"><span class="ni-icon">🤖</span> Analizar bases IA</button>
+  <button class="ni" onclick="ir('competidores',this)"><span class="ni-icon">📊</span> Competidores</button>
+  <button class="ni" onclick="ir('scraper',this)"><span class="ni-icon">⚙</span> Monitor scraper</button>
+
+  <div class="nav-sec">Sistema</div>
+  <button class="ni" onclick="ir('usuarios',this)"><span class="ni-icon">👥</span> Usuarios</button>
+  <button class="ni" onclick="ir('config',this)"><span class="ni-icon">🔧</span> Configuración</button>
+
+  <div class="sf">
+    <div class="uc">
+      <div class="ua">Y</div>
+      <div><div style="font-size:0.78rem;font-weight:600">Young</div><div style="font-size:0.6rem;color:var(--text2)">Administrador</div></div>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
   <div class="topbar">
-    <div class="logo">MP_INTEL</div>
-    <div class="ticket-zone">
-      <span class="t-lbl">Ticket</span>
-      <input class="t-inp" id="tInp" spellcheck="false" autocomplete="off" placeholder="Tu ticket API...">
-      <button class="t-demo" onclick="useDemo()">Demo</button>
-      <button class="t-go" onclick="recargar()">Cargar</button>
+    <div id="PT"><div class="pt">Dashboard</div><div class="ps">Resumen de tu actividad — Mercado Público Chile</div></div>
+    <div class="tr">
+      <div class="ptabs">
+        <button class="pt2 active" onclick="sp(this)">Hoy</button>
+        <button class="pt2" onclick="sp(this)">7 días</button>
+        <button class="pt2" onclick="sp(this)">Mes</button>
+        <button class="pt2" onclick="sp(this)">3 meses</button>
+      </div>
+      <div class="nbell">🔔<div class="ndot"></div></div>
+      <button class="btn p" onclick="toast('🔍 Revisando Mercado Público...','blue')">↻ Revisar ahora</button>
     </div>
-    <div class="t-right">
-      <div class="t-time" id="tTime">—</div>
-      <div class="cd" id="cdEl">↻ <span id="cdVal">5:00</span></div>
-      <button class="btn-r" id="btnR" onclick="recargar()" title="Recargar">↻</button>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="sec active" id="s-dashboard">
+      <div class="g4">
+        <div class="metric blue"><div class="ml">Licitaciones detectadas</div><div class="mv blue">147</div><span class="mc up">+23%</span><span class="mcp">vs mes ant.</span></div>
+        <div class="metric green"><div class="ml">Facturado este mes</div><div class="mv green">$31.4M</div><span class="mc up">+18%</span><span class="mcp">vs mes ant.</span></div>
+        <div class="metric orange"><div class="ml">Postulaciones enviadas</div><div class="mv orange">31</div><span class="mc up">+8</span><span class="mcp">vs mes ant.</span></div>
+        <div class="metric purple"><div class="ml">Tasa adjudicación</div><div class="mv purple">34%</div><span class="mc up">+6%</span><span class="mcp">vs mes ant.</span></div>
+      </div>
+      <div class="g4">
+        <div class="metric cyan"><div class="ml">OC pendientes de cobro</div><div class="mv cyan" style="font-size:1.3rem">$18.2M</div><span class="mc up">4 activas</span></div>
+        <div class="metric red"><div class="ml">Cierran esta semana</div><div class="mv red" style="font-size:1.3rem">3</div><span class="mc dn">¡Urgente!</span></div>
+        <div class="metric pink"><div class="ml">Ganancia real acumulada</div><div class="mv pink" style="font-size:1.3rem">$8.9M</div><span class="mc up">+$2.1M mes</span></div>
+        <div class="metric green"><div class="ml">Alertas WhatsApp hoy</div><div class="mv green" style="font-size:1.3rem">7</div><span class="mc up">✓ Enviadas</span></div>
+      </div>
+      <div class="g21">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Licitaciones por mes</div><div class="cs">Detectadas vs postuladas</div></div><div class="ptabs"><button class="pt2 active" onclick="sp(this)">6M</button><button class="pt2" onclick="sp(this)">1A</button></div></div>
+          <div class="cb">
+            <svg class="chart-svg" viewBox="0 0 660 170" preserveAspectRatio="none">
+              <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/></linearGradient></defs>
+              <line x1="0" y1="42" x2="660" y2="42" stroke="#1e2336" stroke-width="1"/>
+              <line x1="0" y1="85" x2="660" y2="85" stroke="#1e2336" stroke-width="1"/>
+              <line x1="0" y1="128" x2="660" y2="128" stroke="#1e2336" stroke-width="1"/>
+              <text x="4" y="40" fill="#363d55" font-size="10" font-family="IBM Plex Mono">40</text>
+              <text x="4" y="83" fill="#363d55" font-size="10" font-family="IBM Plex Mono">25</text>
+              <text x="4" y="126" fill="#363d55" font-size="10" font-family="IBM Plex Mono">10</text>
+              <path fill="url(#g1)" d="M20,130 C100,108 160,52 220,68 C280,84 320,35 390,42 C440,48 500,78 550,58 C590,42 630,28 660,18 L660,170 L20,170 Z"/>
+              <path fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" d="M20,130 C100,108 160,52 220,68 C280,84 320,35 390,42 C440,48 500,78 550,58 C590,42 630,28 660,18"/>
+              <path fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3" opacity="0.6" d="M20,152 C100,146 160,122 220,132 C280,142 320,102 390,112 C440,120 500,135 550,118 C590,105 630,92 660,84"/>
+              <circle cx="390" cy="42" r="4" fill="#3b82f6" stroke="#080a10" stroke-width="2"/>
+              <circle cx="660" cy="18" r="4" fill="#3b82f6" stroke="#080a10" stroke-width="2"/>
+            </svg>
+            <div class="chl"><span class="chll">Oct</span><span class="chll">Nov</span><span class="chll">Dic</span><span class="chll">Ene</span><span class="chll">Feb</span><span class="chll">Mar</span></div>
+            <div class="leg"><div class="legi"><div class="legd" style="background:var(--blue)"></div>Detectadas</div><div class="legi"><div class="legd" style="background:var(--green);opacity:0.6"></div>Postuladas</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Rendimiento</div><div class="cs">Postulaciones</div></div></div>
+          <div class="dw">
+            <svg width="125" height="125" viewBox="0 0 125 125">
+              <circle cx="62.5" cy="62.5" r="46" fill="none" stroke="#1e2336" stroke-width="13"/>
+              <circle cx="62.5" cy="62.5" r="46" fill="none" stroke="#10b981" stroke-width="13" stroke-dasharray="98 191" stroke-dashoffset="-48" stroke-linecap="round"/>
+              <circle cx="62.5" cy="62.5" r="46" fill="none" stroke="#3b82f6" stroke-width="13" stroke-dasharray="56 191" stroke-dashoffset="-146" stroke-linecap="round"/>
+              <circle cx="62.5" cy="62.5" r="46" fill="none" stroke="#ef4444" stroke-width="13" stroke-dasharray="37 191" stroke-dashoffset="-202" stroke-linecap="round"/>
+            </svg>
+            <div class="dc"><div class="dp">34%</div><div class="dl2">adjudicado</div></div>
+          </div>
+          <div class="dlr">
+            <div class="dlrow"><div class="dlc" style="background:var(--green)"></div><div class="dln">Adjudicadas</div><div class="dlv" style="color:var(--green)">11</div></div>
+            <div class="dlrow"><div class="dlc" style="background:var(--blue)"></div><div class="dln">En evaluación</div><div class="dlv" style="color:var(--blue)">8</div></div>
+            <div class="dlrow"><div class="dlc" style="background:var(--orange)"></div><div class="dln">Pendientes</div><div class="dlv" style="color:var(--orange)">6</div></div>
+            <div class="dlrow"><div class="dlc" style="background:var(--red)"></div><div class="dln">No adjudicadas</div><div class="dlv" style="color:var(--red)">6</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div><div class="ct">⚠️ Cierran pronto</div><div class="cs">Requieren acción inmediata</div></div><button class="btn" onclick="ir('cierres',document.querySelectorAll('.ni')[3])">Ver todos →</button></div>
+        <div class="ci"><div class="cd u">1d</div><div style="flex:1;min-width:0"><div class="cn">Señalética vial sector centro Coyhaique</div><div class="co">Municipalidad de Coyhaique · Aysén</div><div class="cm">N/E</div></div><span class="tag pa">🔴 ALTA</span><button class="btn p" onclick="toast('Abriendo licitación...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd u">2d</div><div style="flex:1;min-width:0"><div class="cn">Rótulos identificación oficinas SII</div><div class="co">SII Santiago Centro · RM</div><div class="cm">$980.000</div></div><span class="tag pa">🔴 ALTA</span><button class="btn p" onclick="toast('Abriendo licitación...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd p">4d</div><div style="flex:1;min-width:0"><div class="cn">Letreros luminosos aeropuerto AMB</div><div class="co">DGAC Chile · RM</div><div class="cm">$18.500.000</div></div><span class="tag pm">🟡 MEDIA</span><button class="btn" onclick="toast('Abriendo licitación...','blue')">Ver →</button></div>
+      </div>
     </div>
-  </div>
 
-  <div class="statsbar">
-    <div class="sc" style="--sc-c:var(--white)"><div class="sc-l">Total</div><div class="sc-v" id="sTot">—</div><div class="sc-s" id="sSub">Sin datos</div></div>
-    <div class="sc" style="--sc-c:var(--green)"><div class="sc-l">Activas</div><div class="sc-v" id="sAct">—</div><div class="sc-s">En proceso</div></div>
-    <div class="sc" style="--sc-c:var(--blue)"><div class="sc-l">Adjudicadas</div><div class="sc-v" id="sAdj">—</div><div class="sc-s" id="sAdjSub">Últ. 7 días</div></div>
-    <div class="sc" style="--sc-c:var(--amber)"><div class="sc-l">Monto adj.</div><div class="sc-v" id="sMon">—</div><div class="sc-s">Total estimado</div></div>
-    <div class="sc" style="--sc-c:var(--g2)"><div class="sc-l">Mostrando</div><div class="sc-v" id="sMos">—</div><div class="sc-s" id="sFlt">—</div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="todas" onclick="setTab(this)">Todas <span class="tab-n" id="c-todas">0</span></button>
-    <button class="tab" data-tab="activa" onclick="setTab(this)">Activas <span class="tab-n" id="c-activa">0</span></button>
-    <button class="tab" data-tab="adjudicada" onclick="setTab(this)">Adjudicadas <span class="tab-n" id="c-adjudicada">0</span></button>
-    <button class="tab" data-tab="cerrada" onclick="setTab(this)">Cerradas <span class="tab-n" id="c-cerrada">0</span></button>
-    <button class="tab" data-tab="otras" onclick="setTab(this)">Otras <span class="tab-n" id="c-otras">0</span></button>
-  </div>
-
-  <div class="toolbar">
-    <div class="srch">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input id="sInp" placeholder="Buscar nombre, organismo, código..." oninput="applyFilters()" autocomplete="off">
+    <!-- BÚSQUEDA -->
+    <div class="sec" id="s-busqueda">
+      <div class="card">
+        <div class="lf">
+          <div class="sw"><span class="si">⌕</span><input type="text" placeholder="Buscar por nombre, ID, organismo..."></div>
+          <button class="pill active" onclick="sp2(this)">Todas</button>
+          <button class="pill" onclick="sp2(this)">🔴 Alta prioridad</button>
+          <button class="pill" onclick="sp2(this)">Compra Ágil</button>
+          <button class="pill" onclick="sp2(this)">LP</button>
+          <button class="pill" onclick="sp2(this)">Nuevas</button>
+        </div>
+        <div class="ll">
+          <div class="li" onclick="ir('detalle',null)">
+            <div class="prio a"></div>
+            <div>
+              <div class="lc">ID: 2494-32-LP26 <span onclick="event.stopPropagation();toast('Código copiado ✓','green')" style="cursor:pointer">⧉</span></div>
+              <div class="ln">Construcción Señalética Sector Centro Coyhaique</div>
+              <div class="lo">🏛 Municipalidad de Coyhaique — Aysén</div>
+              <div class="ltags"><span class="tag lp">LP</span><span class="tag nueva">● Nueva</span><span class="tag pa">🔴 ALTA</span></div>
+              <div class="lacts">
+                <button class="ab p" onclick="event.stopPropagation();ir('detalle',null)">Ver detalle</button>
+                <button class="ab" onclick="event.stopPropagation();toast('Enviado a seguimiento ✓','green')">+ Seguimiento</button>
+                <button class="ab" onclick="event.stopPropagation();ir('ia',null)">🤖 Analizar IA</button>
+                <button class="ab" onclick="event.stopPropagation();ir('presupuestos',null)">📄 Presupuesto</button>
+              </div>
+            </div>
+            <div class="lr"><div class="lm">N/E</div><div class="lcl u">13/04 15:00</div><div class="of">👥 2-3 oferentes</div></div>
+          </div>
+          <div class="li">
+            <div class="prio a"></div>
+            <div>
+              <div class="lc">ID: 3825-99-COT26 <span onclick="event.stopPropagation();toast('Código copiado ✓','green')" style="cursor:pointer">⧉</span></div>
+              <div class="ln">Compra de Señaleticas y Postes Omega (DIMAO)</div>
+              <div class="lo">🏛 Municipalidad de Santiago — RM</div>
+              <div class="ltags"><span class="tag agil">Ágil 1°</span><span class="tag post">● Postulado</span><span class="tag pa">🔴 ALTA</span></div>
+              <div class="lacts"><button class="ab p" onclick="event.stopPropagation()">Ver detalle</button><button class="ab" onclick="event.stopPropagation();ir('ia',null)">🤖 Analizar</button></div>
+            </div>
+            <div class="lr"><div class="lm">$4.200.000</div><div class="lcl u">25/03 17:00</div><div class="of">👥 4-6 oferentes</div></div>
+          </div>
+          <div class="li">
+            <div class="prio m"></div>
+            <div>
+              <div class="lc">ID: 756-44-LP26</div>
+              <div class="ln">Tótems direccionales edificio público MOP</div>
+              <div class="lo">🏛 Ministerio de Obras Públicas — RM</div>
+              <div class="ltags"><span class="tag lp">LP</span><span class="tag eval">● En evaluación</span><span class="tag pm">🟡 MEDIA</span></div>
+              <div class="lacts"><button class="ab p" onclick="event.stopPropagation()">Ver detalle</button><button class="ab" onclick="event.stopPropagation();ir('ia',null)">📊 Análisis comp.</button></div>
+            </div>
+            <div class="lr"><div class="lm">$12.400.000</div><div class="lcl">15/03</div><div class="of">👥 8-12 oferentes</div></div>
+          </div>
+          <div class="li">
+            <div class="prio" style="background:var(--green)"></div>
+            <div>
+              <div class="lc">ID: 1089-1605-COT26</div>
+              <div class="ln">Vinilos adhesivos señalética dependencias municipales</div>
+              <div class="lo">🏛 Municipalidad de Providencia — RM</div>
+              <div class="ltags"><span class="tag agil">Ágil 1°</span><span class="tag gan">● Adjudicado ✓</span><span class="tag pb">🔵 BAJA</span></div>
+              <div class="lacts"><button class="ab p" onclick="event.stopPropagation()">Ver detalle</button><button class="ab" onclick="event.stopPropagation();ir('oc',null)">📋 Ver OC</button></div>
+            </div>
+            <div class="lr"><div class="lm">$1.890.000</div><div class="lcl">22/03</div><div class="of">👥 2-3 oferentes</div></div>
+          </div>
+        </div>
+      </div>
     </div>
-    <select class="sort-sel" id="sortS" onchange="applyFilters()">
-      <option value="fd">↓ Más reciente</option>
-      <option value="fa">↑ Más antiguo</option>
-      <option value="md">↓ Mayor monto</option>
-      <option value="ma">↑ Menor monto</option>
-      <option value="na">A→Z</option>
-    </select>
-    <div class="r-count" id="rCnt"></div>
-    <div class="days-notice" id="daysNote" style="display:none"></div>
-  </div>
 
-  <div class="tbl-scroll">
-    <table>
-      <thead><tr>
-        <th>Código</th>
-        <th>Licitación / Organismo</th>
-        <th>Tipo</th>
-        <th>Publicación</th>
-        <th>Cierre</th>
-        <th style="text-align:right">Monto est.</th>
-        <th>Estado</th>
-      </tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
+    <!-- DETALLE -->
+    <div class="sec" id="s-detalle">
+      <div style="display:flex;align-items:center;gap:0.6rem">
+        <button class="btn" onclick="ir('busqueda',document.querySelectorAll('.ni')[1])">← Volver</button>
+        <span class="tag lp">LP</span><span class="tag nueva">● Publicada</span><span class="tag pa">🔴 ALTA PRIORIDAD</span>
+      </div>
+      <div class="g21">
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div class="card">
+            <div class="ch"><div><div class="ct">Construcción Señalética Sector Centro Coyhaique</div><div class="cs">ID: 2494-32-LP26 · Municipalidad de Coyhaique</div></div></div>
+            <div class="cb">
+              <p style="font-size:0.8rem;color:var(--text2);line-height:1.65;margin-bottom:1rem">142 señales de tránsito y 61 para reposiciones futuras. Postes de madera y señalética de aluminio compuesto grabada mediante CNC router o similar.</p>
+              <div class="cr"><span style="font-size:0.72rem;color:var(--text2)">Publicación</span><span style="font-family:var(--mono);font-size:0.72rem">23/03/2026 17:34</span></div>
+              <div class="cr"><span style="font-size:0.72rem;color:var(--text2)">Cierre</span><span style="font-family:var(--mono);font-size:0.72rem;color:var(--red)">13/04/2026 15:00 ⚠️</span></div>
+              <div class="cr"><span style="font-size:0.72rem;color:var(--text2)">Región</span><span style="font-family:var(--mono);font-size:0.72rem">Aysén</span></div>
+              <div class="cr"><span style="font-size:0.72rem;color:var(--text2)">Oferentes históricos</span><span style="font-family:var(--mono);font-size:0.72rem;color:var(--green)">2-3 (baja competencia)</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Adjuntos (19)</div></div>
+            <div style="padding:0.5rem 0.75rem;border-bottom:1px solid var(--border)"><input type="text" placeholder="Filtrar adjuntos..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.38rem 0.65rem;color:var(--text);font-size:0.75rem;outline:none"></div>
+            <div class="ci" style="padding:0.65rem 1rem"><span style="font-size:0.72rem;color:var(--text2)">📄 DA 3328 APRUEBA BASES TECNICAS.pdf</span><div style="display:flex;gap:0.3rem"><button class="ab" onclick="toast('Abriendo PDF...','blue')">👁 Ver</button><button class="ab" onclick="toast('Descargando...','green')">⬇</button></div></div>
+            <div class="ci" style="padding:0.65rem 1rem"><span style="font-size:0.72rem;color:var(--text2)">📄 DTO4665 BASES ADMINISTRATIVAS.pdf</span><div style="display:flex;gap:0.3rem"><button class="ab" onclick="toast('Abriendo PDF...','blue')">👁 Ver</button><button class="ab" onclick="toast('Descargando...','green')">⬇</button></div></div>
+            <div class="ci" style="padding:0.65rem 1rem"><span style="font-size:0.72rem;color:var(--text2)">📄 EETT SEÑALETICA.pdf</span><div style="display:flex;gap:0.3rem"><button class="ab" onclick="toast('Abriendo PDF...','blue')">👁 Ver</button><button class="ab" onclick="toast('Descargando...','green')">⬇</button></div></div>
+            <div class="ci" style="padding:0.65rem 1rem;justify-content:center;color:var(--text3);font-size:0.7rem">+ 16 documentos más</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div class="card">
+            <div class="ch"><div class="ct">Mi estado</div></div>
+            <div class="cb" style="display:flex;flex-direction:column;gap:0.65rem">
+              <select style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.38rem 0.6rem;color:var(--text);font-size:0.76rem;outline:none;width:100%" onchange="toast('Estado actualizado ✓','green')">
+                <option>Sin revisar</option><option>Revisando bases</option><option>Postulado</option><option>Adjudicado ✓</option><option>No adjudicado</option>
+              </select>
+              <div style="display:flex;flex-wrap:wrap;gap:0.3rem"><span class="tag etiq">🏷 urgente</span><span class="tag etiq" style="cursor:pointer;border-style:dashed" onclick="toast('Agregar etiqueta...','blue')">+ nueva</span></div>
+              <button class="btn p" onclick="toast('En seguimiento ✓','green')" style="width:100%">▷ Seguimiento</button>
+              <button class="btn" onclick="ir('presupuestos',null)" style="width:100%">📄 Generar presupuesto</button>
+              <button class="btn g" onclick="toast('Enviando alerta WhatsApp...','green')" style="width:100%">📱 Enviar alerta</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">🤖 Analizar con IA</div></div>
+            <div class="cb" style="padding-bottom:0.5rem">
+              <div class="iac" onclick="toast('Analizando bases con Claude...','blue')"><div class="ian">⚡ Estrategia para Ganar</div><div class="iad">Criterios, ponderaciones y tácticas para máximo puntaje</div></div>
+              <div class="iac" onclick="toast('Generando checklist...','blue')"><div class="ian">✅ Checklist Requisitos</div><div class="iad">Documentos y causales de inadmisibilidad</div></div>
+              <div class="iac" onclick="toast('Analizando competencia...','blue')"><div class="ian">📊 Análisis Competencia</div><div class="iad">Perfil del ganador y lecciones aprendidas</div></div>
+              <div class="iac" onclick="toast('Evaluando...','blue')"><div class="ian">🎯 Evaluación Rápida</div><div class="iad">¿Me conviene postular? Respuesta directa</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="pager">
-    <button class="pg-btn" id="pPrev" onclick="chPage(-1)" disabled>← Anterior</button>
-    <span id="pInfo" style="color:var(--g1)">—</span>
-    <button class="pg-btn" id="pNext" onclick="chPage(1)" disabled>Siguiente →</button>
+    <!-- CALENDARIO -->
+    <div class="sec" id="s-calendario">
+      <div class="card">
+        <div class="ch">
+          <div><div class="ct">📅 Calendario de cierres — Abril 2026</div><div class="cs">Haz clic en cualquier día para ver las licitaciones</div></div>
+          <div style="display:flex;gap:0.5rem"><button class="btn" onclick="toast('Mes anterior','blue')">← Mar</button><button class="btn" onclick="toast('Mes siguiente','blue')">May →</button></div>
+        </div>
+        <div class="cb">
+          <div class="cal-header">
+            <div class="cal-day-name">LUN</div><div class="cal-day-name">MAR</div><div class="cal-day-name">MIÉ</div><div class="cal-day-name">JUE</div><div class="cal-day-name">VIE</div><div class="cal-day-name">SÁB</div><div class="cal-day-name">DOM</div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-empty"></div><div class="cal-day"><div class="cal-num">1</div></div><div class="cal-day"><div class="cal-num">2</div></div><div class="cal-day"><div class="cal-num">3</div></div><div class="cal-day"><div class="cal-num">4</div></div><div class="cal-day"><div class="cal-num">5</div></div><div class="cal-day"><div class="cal-num">6</div></div>
+            <div class="cal-day"><div class="cal-num">7</div></div><div class="cal-day"><div class="cal-num">8</div></div><div class="cal-day"><div class="cal-num">9</div></div><div class="cal-day"><div class="cal-num">10</div></div><div class="cal-day"><div class="cal-num">11</div></div><div class="cal-day"><div class="cal-num">12</div></div><div class="cal-day"><div class="cal-num">13</div></div>
+            <div class="cal-day has-event" onclick="toast('Señalética Coyhaique · cierra hoy 15:00','red')"><div class="cal-num" style="color:var(--red)">13</div><div class="cal-event red">Señalética Coyhaique</div></div>
+            <div class="cal-day"><div class="cal-num">14</div></div><div class="cal-day"><div class="cal-num">15</div></div>
+            <div class="cal-day has-event" onclick="toast('Letreros DGAC · cierra 18/04','orange')"><div class="cal-num">18</div><div class="cal-event orange">DGAC Letreros</div></div>
+            <div class="cal-day"><div class="cal-num">19</div></div><div class="cal-day"><div class="cal-num">20</div></div>
+            <div class="cal-day today"><div class="cal-num today">27</div><div class="cal-event blue">Hoy</div></div>
+            <div class="cal-day has-event" onclick="toast('Banner Biobío · cierra 28/04','orange')"><div class="cal-num">28</div><div class="cal-event orange">Banner Biobío</div></div>
+            <div class="cal-day"><div class="cal-num">29</div></div><div class="cal-day"><div class="cal-num">30</div></div>
+          </div>
+          <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.15)"></div>Cierra hoy/mañana</div>
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,158,11,0.15)"></div>Cierra esta semana</div>
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,0.15)"></div>Hoy</div>
+            <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(16,185,129,0.15)"></div>Adjudicado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCIERO -->
+    <div class="sec" id="s-financiero">
+      <div class="g4">
+        <div class="metric green"><div class="ml">Facturado total acumulado</div><div class="mv green">$89.4M</div><span class="mc up">+22%</span><span class="mcp">vs año ant.</span></div>
+        <div class="metric blue"><div class="ml">Por cobrar (OC activas)</div><div class="mv blue">$18.2M</div><span class="mc up">4 OC</span><span class="mcp">pendientes</span></div>
+        <div class="metric pink"><div class="ml">Ganancia real estimada</div><div class="mv pink">$8.9M</div><span class="mc up">~28% margen</span></div>
+        <div class="metric orange"><div class="ml">Licitaciones adjudicadas</div><div class="mv orange">11</div><span class="mc up">este año</span></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div><div class="ct">Detalle por licitación adjudicada</div><div class="cs">OC vs facturado vs ganancia real</div></div><button class="btn p" onclick="toast('Exportando a Excel...','green')">⬇ Exportar</button></div>
+        <div class="fi" style="background:var(--bg3);border-bottom:1px solid var(--border)">
+          <div style="font-size:0.6rem;color:var(--text3);font-family:var(--mono)">LICITACIÓN</div>
+          <div style="font-size:0.6rem;color:var(--text3);font-family:var(--mono);text-align:right">MONTO OC</div>
+          <div style="font-size:0.6rem;color:var(--text3);font-family:var(--mono);text-align:right">FACTURADO</div>
+          <div style="font-size:0.6rem;color:var(--text3);font-family:var(--mono);text-align:right">GANANCIA</div>
+        </div>
+        <div class="fi">
+          <div><div class="fn">Vinilos adhesivos Municipalidad Providencia</div><div class="fo">OC: 751-1234-CM26 · Adjudicado 22/03/2026</div><div class="fbar"><div class="fbar-fill" style="width:100%;background:var(--green)"></div></div></div>
+          <div class="fval blue">$1.890.000</div>
+          <div class="fval green">$1.890.000</div>
+          <div class="fval green">$378.000</div>
+        </div>
+        <div class="fi">
+          <div><div class="fn">Señalética hospital pediátrico Servicio Salud Sur</div><div class="fo">OC: 445-5678-CM26 · Adjudicado 15/03/2026</div><div class="fbar"><div class="fbar-fill" style="width:60%;background:var(--orange)"></div></div></div>
+          <div class="fval blue">$5.700.000</div>
+          <div class="fval orange">$3.420.000</div>
+          <div class="fval orange">$684.000</div>
+        </div>
+        <div class="fi">
+          <div><div class="fn">Banner y pendones evento regional Biobío</div><div class="fo">OC: 223-9012-CM26 · Adjudicado 10/03/2026</div><div class="fbar"><div class="fbar-fill" style="width:30%;background:var(--red)"></div></div></div>
+          <div class="fval blue">$2.100.000</div>
+          <div class="fval" style="color:var(--red)">$630.000</div>
+          <div class="fval" style="color:var(--red)">$126.000</div>
+        </div>
+        <div class="fi">
+          <div><div class="fn">Rótulos Hospital Regional Concepción</div><div class="fo">OC: 118-3456-CM26 · Adjudicado 05/03/2026</div><div class="fbar"><div class="fbar-fill" style="width:100%;background:var(--green)"></div></div></div>
+          <div class="fval blue">$4.800.000</div>
+          <div class="fval green">$4.800.000</div>
+          <div class="fval green">$960.000</div>
+        </div>
+        <div style="padding:0.75rem 1.3rem;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr auto auto auto;gap:1rem">
+          <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2)">TOTALES</div>
+          <div class="fval blue">$14.490.000</div>
+          <div class="fval green">$10.740.000</div>
+          <div class="fval green">$2.148.000</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div><div class="ct">Agregar boleta/factura</div><div class="cs">Registra pagos recibidos para mantener el seguimiento</div></div></div>
+        <div class="cb" style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.75rem;align-items:end">
+          <div><div style="font-size:0.7rem;color:var(--text2);margin-bottom:0.35rem">Licitación</div><select style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.38rem 0.6rem;color:var(--text);font-size:0.76rem;outline:none;width:100%"><option>Vinilos Providencia</option><option>Señalética Hospital</option><option>Banner Biobío</option></select></div>
+          <div><div style="font-size:0.7rem;color:var(--text2);margin-bottom:0.35rem">Monto facturado</div><input type="text" placeholder="$0" class="ci2" style="width:100%"></div>
+          <button class="btn p" onclick="toast('Boleta registrada ✓','green')">+ Registrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÓRDENES DE COMPRA -->
+    <div class="sec" id="s-oc">
+      <div class="g3">
+        <div class="metric blue"><div class="ml">OC activas</div><div class="mv blue">4</div><span class="mc up">$18.2M total</span></div>
+        <div class="metric green"><div class="ml">OC pagadas este mes</div><div class="mv green">2</div><span class="mc up">$6.6M cobrado</span></div>
+        <div class="metric orange"><div class="ml">Días promedio de pago</div><div class="mv orange">28d</div><span class="mc dn">+3d vs meta</span></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div><div class="ct">Órdenes de compra</div><div class="cs">Importadas automáticamente desde Mercado Público vía RUT empresa</div></div><button class="btn p" onclick="toast('Sincronizando con Mercado Público...','green')">↻ Sincronizar</button></div>
+        <div class="oc-item">
+          <div><div class="oc-num">OC-751-1234-CM26</div><div class="oc-nombre">Vinilos adhesivos dependencias municipales</div><div class="oc-org">Municipalidad de Providencia · $1.890.000</div></div>
+          <span class="oc-estado pag">● Pagada</span>
+          <button class="ab p" onclick="toast('Ver OC completa...','blue')">Ver →</button>
+        </div>
+        <div class="oc-item">
+          <div><div class="oc-num">OC-445-5678-CM26</div><div class="oc-nombre">Señalética hospital pediátrico</div><div class="oc-org">Servicio de Salud Sur · $5.700.000</div></div>
+          <span class="oc-estado pend">● Pendiente</span>
+          <button class="ab p" onclick="toast('Ver OC completa...','blue')">Ver →</button>
+        </div>
+        <div class="oc-item">
+          <div><div class="oc-num">OC-223-9012-CM26</div><div class="oc-nombre">Banner y pendones evento regional</div><div class="oc-org">Intendencia Biobío · $2.100.000</div></div>
+          <span class="oc-estado proc">● En proceso</span>
+          <button class="ab p" onclick="toast('Ver OC completa...','blue')">Ver →</button>
+        </div>
+        <div class="oc-item">
+          <div><div class="oc-num">OC-118-3456-CM26</div><div class="oc-nombre">Rótulos Hospital Regional Concepción</div><div class="oc-org">Servicio de Salud Biobío · $4.800.000</div></div>
+          <span class="oc-estado pag">● Pagada</span>
+          <button class="ab p" onclick="toast('Ver OC completa...','blue')">Ver →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRESUPUESTOS -->
+    <div class="sec" id="s-presupuestos">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Presupuestos generados</div><div class="cs">PDF automático a partir de los datos de la licitación</div></div><button class="btn p" onclick="toast('Nuevo presupuesto...','blue')">+ Nuevo</button></div>
+        <div class="pres-item">
+          <div><div class="pres-num">PRES-2026-031</div><div class="pres-nombre">Construcción Señalética Coyhaique</div><div class="pres-fecha">Generado: 24/03/2026 · ID: 2494-32-LP26</div></div>
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--green);font-weight:600">$6.300.000</div>
+          <span class="pres-estado bor">Borrador</span>
+          <div style="display:flex;gap:0.3rem"><button class="ab p" onclick="toast('Abriendo PDF...','blue')">Ver</button><button class="ab" onclick="toast('Descargando...','green')">⬇</button></div>
+        </div>
+        <div class="pres-item">
+          <div><div class="pres-num">PRES-2026-028</div><div class="pres-nombre">Rótulos identificación oficinas SII</div><div class="pres-fecha">Generado: 22/03/2026 · ID: 1120-45-COT26</div></div>
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--green);font-weight:600">$980.000</div>
+          <span class="pres-estado env">Enviado</span>
+          <div style="display:flex;gap:0.3rem"><button class="ab p" onclick="toast('Abriendo PDF...','blue')">Ver</button><button class="ab" onclick="toast('Descargando...','green')">⬇</button></div>
+        </div>
+        <div class="pres-item">
+          <div><div class="pres-num">PRES-2026-025</div><div class="pres-nombre">Vinilos adhesivos Municipalidad Providencia</div><div class="pres-fecha">Generado: 20/03/2026 · ID: 1089-1605-COT26</div></div>
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--green);font-weight:600">$1.890.000</div>
+          <span class="pres-estado apr">Adjudicado ✓</span>
+          <div style="display:flex;gap:0.3rem"><button class="ab p" onclick="toast('Abriendo PDF...','blue')">Ver</button><button class="ab" onclick="toast('Descargando...','green')">⬇</button></div>
+        </div>
+        <div class="pres-item">
+          <div><div class="pres-num">PRES-2026-019</div><div class="pres-nombre">Demarcación vial SERVIU RM</div><div class="pres-fecha">Generado: 15/03/2026 · ID: 2201-88-COT26</div></div>
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--red);font-weight:600">$23.600.000</div>
+          <span class="pres-estado rec">No adjudicado</span>
+          <div style="display:flex;gap:0.3rem"><button class="ab p" onclick="toast('Abriendo PDF...','blue')">Ver</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div><div class="ct">Generar nuevo presupuesto</div><div class="cs">Los datos se pre-llenan desde la licitación automáticamente</div></div></div>
+        <div class="cb" style="display:flex;flex-direction:column;gap:0.75rem">
+          <div class="g2">
+            <div><div style="font-size:0.7rem;color:var(--text2);margin-bottom:0.35rem">Licitación</div><input type="text" placeholder="ID o nombre de licitación" class="ci2" style="width:100%"></div>
+            <div><div style="font-size:0.7rem;color:var(--text2);margin-bottom:0.35rem">Monto a cotizar</div><input type="text" placeholder="$0" class="ci2" style="width:100%"></div>
+          </div>
+          <div><div style="font-size:0.7rem;color:var(--text2);margin-bottom:0.35rem">Notas adicionales</div><textarea placeholder="Observaciones, detalles técnicos..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.5rem 0.7rem;color:var(--text);font-family:var(--body);font-size:0.76rem;outline:none;resize:vertical;min-height:60px"></textarea></div>
+          <button class="btn p" onclick="toast('Generando PDF automáticamente...','green')" style="width:100%">📄 Generar presupuesto PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="sec" id="s-alertas">
+      <div class="g21">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Historial de alertas WhatsApp</div><div class="cs">Registro completo de mensajes enviados</div></div></div>
+          <div class="ai"><div class="aico ok">✅</div><div><div class="an">Construcción Señalética Sector Centro Coyhaique<span class="ac">📱 WhatsApp</span></div><div class="am">23/03 17:34 · 🔴 ALTA · 2-3 oferentes · POSTULAR RÁPIDO</div></div></div>
+          <div class="ai"><div class="aico ok">✅</div><div><div class="an">Compra Señaleticas y Postes Omega DIMAO<span class="ac">📱 WhatsApp</span></div><div class="am">23/03 10:12 · 🔴 ALTA · 4-6 oferentes · EVALUAR</div></div></div>
+          <div class="ai"><div class="aico ok">✅</div><div><div class="an">Rótulos identificación oficinas SII Santiago<span class="ac">📱 WhatsApp</span></div><div class="am">22/03 14:50 · 🔴 ALTA · 3-5 oferentes · POSTULAR RÁPIDO</div></div></div>
+          <div class="ai"><div class="aico fail">❌</div><div><div class="an">Letreros luminosos aeropuerto AMB<span class="ac fail">Fallida</span></div><div class="am">22/03 09:30 · Error Twilio · Backoff 30s → reintento OK</div></div></div>
+          <div class="ai"><div class="aico ok">✅</div><div><div class="an">OC Nueva: Vinilos Municipalidad Providencia<span class="ac">📱 WhatsApp</span></div><div class="am">22/03 08:15 · 🎉 ADJUDICADO · $1.890.000 · OC-751-1234</div></div></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct">Preview mensaje WhatsApp</div></div>
+          <div class="cb">
+            <div class="wsp">
+              <span style="display:block"><span class="wb">🚨 Compra Ágil Detectada</span></span>
+              <span style="display:block"> </span>
+              <span style="display:block">💰 $1.250.000</span>
+              <span style="display:block">🏛️ Municipalidad de Coyhaique</span>
+              <span style="display:block">📦 Servicio: Letreros PVC</span>
+              <span style="display:block">⏳ Cierra en 4h</span>
+              <span style="display:block">📍 RM</span>
+              <span style="display:block"> </span>
+              <span style="display:block"><span class="wg">🟢 Probabilidad: ALTA</span></span>
+              <span style="display:block">👥 Histórico: 2-3 oferentes</span>
+              <span style="display:block"> </span>
+              <span style="display:block"><span class="wb">💡 POSTULAR RÁPIDO</span></span>
+              <span style="display:block"> </span>
+              <span style="display:block" style="color:var(--cyan)">👉 Ver detalles: [link]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CIERRES -->
+    <div class="sec" id="s-cierres">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Próximos cierres</div><div class="cs">Ordenados por urgencia — actúa primero en los rojos</div></div></div>
+        <div class="ci"><div class="cd u">1d</div><div style="flex:1;min-width:0"><div class="cn">Señalética vial sector centro Coyhaique</div><div class="co">Municipalidad de Coyhaique</div><div class="cm">N/E</div></div><span class="tag pa">🔴 ALTA</span><button class="btn p" onclick="toast('Abriendo...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd u">2d</div><div style="flex:1;min-width:0"><div class="cn">Rótulos identificación oficinas SII</div><div class="co">SII Santiago Centro</div><div class="cm">$980.000</div></div><span class="tag pa">🔴 ALTA</span><button class="btn p" onclick="toast('Abriendo...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd u">2d</div><div style="flex:1;min-width:0"><div class="cn">Compra Señaleticas y Postes Omega</div><div class="co">Municipalidad de Santiago</div><div class="cm">$4.200.000</div></div><span class="tag pa">🔴 ALTA</span><button class="btn p" onclick="toast('Abriendo...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd p">4d</div><div style="flex:1;min-width:0"><div class="cn">Letreros luminosos aeropuerto AMB</div><div class="co">DGAC Chile</div><div class="cm">$18.500.000</div></div><span class="tag pm">🟡 MEDIA</span><button class="btn" onclick="toast('Abriendo...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd p">6d</div><div style="flex:1;min-width:0"><div class="cn">Banner y pendones evento regional</div><div class="co">Intendencia Biobío</div><div class="cm">$2.100.000</div></div><span class="tag pm">🟡 MEDIA</span><button class="btn" onclick="toast('Abriendo...','blue')">Ver →</button></div>
+        <div class="ci"><div class="cd n">12d</div><div style="flex:1;min-width:0"><div class="cn">Señalética hospital pediátrico</div><div class="co">Servicio de Salud Sur</div><div class="cm">$5.700.000</div></div><span class="tag pb">🔵 BAJA</span><button class="btn" onclick="toast('Abriendo...','blue')">Ver →</button></div>
+      </div>
+    </div>
+
+    <!-- SEGUIMIENTO -->
+    <div class="sec" id="s-seguimiento">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Seguimiento de postulaciones</div><div class="cs">Licitaciones en gestión activa</div></div></div>
+        <div class="ll">
+          <div class="li"><div class="prio a"></div><div><div class="lc">ID: 2494-32-LP26</div><div class="ln">Construcción Señalética Sector Centro Coyhaique</div><div class="lo">🏛 Municipalidad de Coyhaique</div><div class="ltags"><span class="tag lp">LP</span><span class="tag nueva">● Revisando</span><span class="tag pa">🔴 ALTA</span></div></div><div class="lr"><div class="lm">N/E</div><div class="lcl u">Cierra en 21 días</div></div></div>
+          <div class="li"><div class="prio a"></div><div><div class="lc">ID: 3825-99-COT26</div><div class="ln">Compra Señaleticas y Postes Omega DIMAO</div><div class="lo">🏛 Municipalidad de Santiago</div><div class="ltags"><span class="tag agil">Ágil 1°</span><span class="tag post">● Postulado</span><span class="tag pa">🔴 ALTA</span></div></div><div class="lr"><div class="lm">$4.200.000</div><div class="lcl u">Cierra en 2 días</div></div></div>
+          <div class="li"><div class="prio m"></div><div><div class="lc">ID: 756-44-LP26</div><div class="ln">Tótems direccionales edificio MOP</div><div class="lo">🏛 Ministerio de Obras Públicas</div><div class="ltags"><span class="tag lp">LP</span><span class="tag eval">● En evaluación</span><span class="tag pm">🟡 MEDIA</span></div></div><div class="lr"><div class="lm">$12.400.000</div><div class="lcl">Esperando acta</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IA -->
+    <div class="sec" id="s-ia">
+      <div class="g21">
+        <div class="card">
+          <div class="ch"><div><div class="ct">🤖 Analizar bases con IA</div><div class="cs">Powered by Claude (Anthropic) — invisible para el usuario</div></div></div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:0.85rem">
+            <div style="border:2px dashed var(--border2);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer" onclick="toast('Seleccionar PDF de bases...','blue')">
+              <div style="font-size:1.8rem;margin-bottom:0.4rem">📄</div>
+              <div style="font-size:0.8rem;color:var(--text2)">Arrastra el PDF aquí o haz clic para seleccionar</div>
+            </div>
+            <div style="display:flex;gap:0.5rem">
+              <input type="text" placeholder="O ingresa ID licitación (ej: 2494-32-LP26)" class="kwin">
+              <button class="btn p" onclick="toast('Descargando bases automáticamente...','green')">Auto-descargar</button>
+            </div>
+            <div class="iac" onclick="toast('Analizando con Claude API...','blue')"><div class="ian">⚡ Estrategia para Ganar</div><div class="iad">Criterios con ponderaciones, exigencias críticas y 3 estrategias para máximo puntaje</div></div>
+            <div class="iac" onclick="toast('Generando checklist...','blue')"><div class="ian">✅ Checklist de Requisitos</div><div class="iad">Docs por categoría (Adm/Téc/Eco), certificaciones y causales de inadmisibilidad</div></div>
+            <div class="iac" onclick="toast('Analizando acta de adjudicación...','blue')"><div class="ian">📊 Análisis de Competencia</div><div class="iad">Perfil del ganador, criterios determinantes y lección aprendida</div></div>
+            <div class="iac" onclick="toast('Evaluando en 3 puntos...','blue')"><div class="ian">🎯 Evaluación Rápida</div><div class="iad">¿Me conviene postular? Sí/No/Depende + razones concretas</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div class="card">
+            <div class="ch"><div class="ct">Últimos análisis</div></div>
+            <div style="padding:0.75rem">
+              <div class="iac"><div class="ian" style="font-size:0.72rem">⚡ Estrategia para Ganar</div><div class="iad">ID: 3825-99-COT26 · hace 2h</div></div>
+              <div class="iac"><div class="ian" style="font-size:0.72rem">✅ Checklist Requisitos</div><div class="iad">ID: 2494-32-LP26 · hace 5h</div></div>
+              <div class="iac"><div class="ian" style="font-size:0.72rem">📊 Análisis Competencia</div><div class="iad">ID: 2201-88-COT26 · ayer</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Estado Claude API</div></div>
+            <div class="cb" style="padding:0.75rem">
+              <div class="cr" style="border:none;padding:0.25rem 0"><span style="font-size:0.72rem;color:var(--text2)">Modelo</span><span style="font-family:var(--mono);font-size:0.65rem;color:var(--cyan)">claude-sonnet-4-6</span></div>
+              <div class="cr" style="border:none;padding:0.25rem 0"><span style="font-size:0.72rem;color:var(--text2)">Estado</span><span style="font-family:var(--mono);font-size:0.65rem;color:var(--green)">● Operativo</span></div>
+              <div class="cr" style="border:none;padding:0.25rem 0"><span style="font-size:0.72rem;color:var(--text2)">Costo estimado/mes</span><span style="font-family:var(--mono);font-size:0.65rem;color:var(--text2)">~$1-3 USD</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRAPER -->
+    <div class="sec" id="s-scraper">
+      <div class="g4">
+        <div class="metric cyan"><div class="ml">Modo actual</div><div style="font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan)">PICO</div><div style="font-size:0.62rem;color:var(--text2);margin-top:0.3rem">09:00-13:00 · cada 3-5 min</div></div>
+        <div class="metric green"><div class="ml">Próxima ejecución</div><div class="mv green" style="font-size:1.3rem">4m</div><span style="font-family:var(--mono);font-size:0.62rem;color:var(--text3)">intervalo aleatorio</span></div>
+        <div class="metric blue"><div class="ml">Ejecuciones hoy</div><div class="mv blue" style="font-size:1.3rem">87</div><span class="mc up">Sin bloqueos</span></div>
+        <div class="metric orange"><div class="ml">Requests ahorrados</div><div class="mv orange" style="font-size:1.3rem">340</div><span style="font-size:0.62rem;color:var(--text3)">paginación inteligente</span></div>
+      </div>
+      <div class="g21">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Frecuencia dinámica</div><div class="cs">Intervalos aleatorios según horario — simula comportamiento humano</div></div></div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:0.6rem">
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:0.75rem;align-items:center;padding:0.65rem 0.85rem;border-radius:8px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15)">
+              <span style="font-family:var(--mono);font-size:0.72rem;color:var(--cyan)">09:00–13:00</span>
+              <div style="background:var(--bg4);border-radius:3px;height:6px"><div style="width:85%;height:100%;background:var(--cyan);border-radius:3px"></div></div>
+              <span style="font-family:var(--mono);font-size:0.68rem;color:var(--text2)">3–5 min</span>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:0.75rem;align-items:center;padding:0.65rem 0.85rem;border-radius:8px;background:var(--bg3);border:1px solid var(--border)">
+              <span style="font-family:var(--mono);font-size:0.72rem;color:var(--blue)">13:00–18:30</span>
+              <div style="background:var(--bg4);border-radius:3px;height:6px"><div style="width:60%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+              <span style="font-family:var(--mono);font-size:0.68rem;color:var(--text2)">5–10 min</span>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:0.75rem;align-items:center;padding:0.65rem 0.85rem;border-radius:8px;background:var(--bg3);border:1px solid var(--border)">
+              <span style="font-family:var(--mono);font-size:0.72rem;color:var(--orange)">18:30–23:00</span>
+              <div style="background:var(--bg4);border-radius:3px;height:6px"><div style="width:30%;height:100%;background:var(--orange);border-radius:3px"></div></div>
+              <span style="font-family:var(--mono);font-size:0.68rem;color:var(--text2)">15–30 min</span>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:0.75rem;align-items:center;padding:0.65rem 0.85rem;border-radius:8px;background:var(--bg3);border:1px solid var(--border)">
+              <span style="font-family:var(--mono);font-size:0.72rem;color:var(--text3)">23:00–08:30</span>
+              <div style="background:var(--bg4);border-radius:3px;height:6px"><div style="width:12%;height:100%;background:var(--text3);border-radius:3px"></div></div>
+              <span style="font-family:var(--mono);font-size:0.68rem;color:var(--text2)">30–60 min</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct">Log de actividad</div></div>
+          <div class="cb" style="padding:0.5rem 0.75rem">
+            <div class="log"><span class="logt">09:42</span><span class="logok">✓ 3 nuevas · señalética · alerta enviada</span></div>
+            <div class="log"><span class="logt">09:38</span><span class="logok">✓ Sin cambios · 2 páginas · stop</span></div>
+            <div class="log"><span class="logt">09:33</span><span class="logok">✓ 1 nueva · letrero PVC RM · alerta</span></div>
+            <div class="log"><span class="logt">09:29</span><span class="logok">✓ Sin cambios · paginación OK</span></div>
+            <div class="log"><span class="logt">09:24</span><span class="logw">⚠ Timeout · backoff 30s · reintento OK</span></div>
+            <div class="log"><span class="logt">09:20</span><span class="logok">✓ 2 nuevas · totem + vinilo</span></div>
+            <div class="log"><span class="logt">09:15</span><span class="logok">✓ OC detectada tu RUT · alerta enviada</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPETIDORES -->
+    <div class="sec" id="s-competidores">
+      <div class="card"><div class="cb" style="text-align:center;padding:3rem">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">📊</div>
+        <div style="font-family:var(--display);font-size:0.95rem;font-weight:600;margin-bottom:0.4rem">Análisis de Competidores</div>
+        <div style="font-size:0.78rem;color:var(--text2);margin-bottom:1.25rem">Quién gana señalética, a qué precios y con qué organismos.<br>Disponible una vez el sistema acumule datos históricos.</div>
+        <button class="btn p" onclick="toast('Disponible próximamente','blue')">Próximamente</button>
+      </div></div>
+    </div>
+
+    <!-- DECL JURADA -->
+    <div class="sec" id="s-decjurada">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Declaración Jurada de Requisitos para Ofertar</div><div class="cs">Complétala una vez — el sistema genera el PDF automáticamente en cada postulación</div></div></div>
+        <div class="cb" style="display:flex;flex-direction:column;gap:0.75rem">
+          <div style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.12);border-radius:8px;padding:0.75rem;font-size:0.76rem;color:var(--text2)">ℹ️ Completa esta declaración por única vez. El sistema pre-llenará automáticamente en cada postulación.</div>
+          <div class="cr"><span class="crl">Representante Legal</span><input class="ci2" placeholder="Nombre completo" style="width:220px"></div>
+          <div class="cr"><span class="crl">RUT Empresa</span><input class="ci2" placeholder="12.345.678-9" style="width:220px"></div>
+          <div class="cr"><span class="crl">RUT Representante</span><input class="ci2" placeholder="12.345.678-9" style="width:220px"></div>
+          <div style="font-size:0.76rem;font-weight:500;margin-top:0.25rem">Declaraciones (marcar todas):</div>
+          <label style="display:flex;gap:0.65rem;align-items:flex-start;cursor:pointer;font-size:0.73rem;color:var(--text2)"><input type="checkbox" style="margin-top:3px;flex-shrink:0"> 1.- No he sido condenado por prácticas antisindicales dentro de los dos años anteriores.</label>
+          <label style="display:flex;gap:0.65rem;align-items:flex-start;cursor:pointer;font-size:0.73rem;color:var(--text2)"><input type="checkbox" style="margin-top:3px;flex-shrink:0"> 2.- No he sido condenado por el Tribunal de Defensa de la Libre Competencia dentro de los 5 años anteriores.</label>
+          <label style="display:flex;gap:0.65rem;align-items:flex-start;cursor:pointer;font-size:0.73rem;color:var(--text2)"><input type="checkbox" style="margin-top:3px;flex-shrink:0"> 3.- Mi representada no ha sido condenada a prohibición de contratar con organismos del Estado.</label>
+          <label style="display:flex;gap:0.65rem;align-items:flex-start;cursor:pointer;font-size:0.73rem;color:var(--text2)"><input type="checkbox" style="margin-top:3px;flex-shrink:0"> 4.- No soy funcionario directivo del organismo licitante durante el último año.</label>
+          <button class="btn p" onclick="toast('Declaración guardada ✓ — PDF listo','green')" style="width:100%;padding:0.55rem">✍ Guardar y generar PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div class="sec" id="s-usuarios">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Gestión de usuarios</div><div class="cs">Roles: Administrador / Usuario / Solo lectura</div></div><div style="display:flex;gap:0.5rem"><button class="btn" onclick="toast('Agregar contacto...','blue')">+ Contacto</button><button class="btn p" onclick="toast('Invitar usuario...','green')">+ Agregar</button></div></div>
+        <table class="ut">
+          <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Último acceso</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:0.55rem"><div class="uas" style="background:linear-gradient(135deg,var(--blue),var(--purple))">Y</div><span style="font-weight:500">Young</span></div></td><td style="color:var(--text2);font-size:0.72rem">young@empresa.cl</td><td><span class="rb admin">Administrador</span></td><td style="color:var(--text2);font-size:0.68rem;font-family:var(--mono)">Ahora</td><td></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:0.55rem"><div class="uas" style="background:linear-gradient(135deg,var(--green),var(--cyan))">B</div><span style="font-weight:500">Bastian</span></div></td><td style="color:var(--text2);font-size:0.72rem">bastian@empresa.cl</td><td><select style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:0.18rem 0.45rem;color:var(--text);font-size:0.68rem;outline:none" onchange="toast('Rol actualizado ✓','green')"><option>Usuario</option><option>Administrador</option><option>Solo lectura</option></select></td><td style="color:var(--text2);font-size:0.68rem;font-family:var(--mono)">Hoy 14:32</td><td><button class="ab" onclick="toast('Eliminar...','red')">✕</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="sec" id="s-config">
+      <div class="g21">
+        <div class="card"><div class="cb">
+          <div style="margin-bottom:1.25rem">
+            <div class="sct">Palabras clave — Incluir</div>
+            <div style="display:flex;flex-wrap:wrap;margin-bottom:0.65rem">
+              <span class="kwtag inc">señaletica ×</span><span class="kwtag inc">señalética ×</span><span class="kwtag inc">letrero ×</span><span class="kwtag inc">vinilo ×</span><span class="kwtag inc">cartel ×</span><span class="kwtag inc">rotulo ×</span><span class="kwtag inc">totem ×</span><span class="kwtag inc">banner ×</span><span class="kwtag inc">placa ×</span><span class="kwtag inc">señalizacion ×</span>
+            </div>
+            <div style="display:flex;gap:0.4rem"><input class="kwin" placeholder="Agregar palabra..."><button class="btn p" onclick="toast('Palabra incluida ✓','green')">+ Incluir</button></div>
+          </div>
+          <div style="margin-bottom:1.25rem">
+            <div class="sct">Palabras de exclusión</div>
+            <div style="display:flex;flex-wrap:wrap;margin-bottom:0.65rem">
+              <span class="kwtag exc">software ×</span><span class="kwtag exc">capacitacion ×</span><span class="kwtag exc">consultoria ×</span>
+            </div>
+            <div style="display:flex;gap:0.4rem"><input class="kwin" placeholder="Palabra a excluir..."><button class="btn d" onclick="toast('Palabra excluida ✓','orange')">✕ Excluir</button></div>
+          </div>
+          <div style="margin-bottom:1.25rem">
+            <div class="sct">Modo búsqueda</div>
+            <div style="display:flex;gap:0.5rem">
+              <button class="pill active" onclick="sp2(this)">OR — cualquier palabra</button>
+              <button class="pill" onclick="sp2(this)">AND — todas las palabras</button>
+            </div>
+          </div>
+          <div style="margin-bottom:1.25rem">
+            <div class="sct">Alertas WhatsApp</div>
+            <div class="cr"><div><div class="crl">Mi número</div></div><input class="ci2" value="+569XXXXXXXX" style="width:160px"></div>
+            <div class="cr"><div><div class="crl">Número grupo</div><div class="crs">Alertas a grupo WhatsApp</div></div><input class="ci2" placeholder="+569XXXXXXXX" style="width:160px"></div>
+            <div class="cr"><div><div class="crl">Alertas activas</div></div><label class="toggle"><input type="checkbox" checked><div class="tt"></div><div class="th"></div></label></div>
+          </div>
+          <button class="btn p" onclick="toast('Configuración guardada ✓','green')" style="width:100%;padding:0.55rem">Guardar todo</button>
+        </div></div>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div class="card"><div class="ch"><div class="ct">Estado del sistema</div></div>
+            <div class="cb" style="padding:0.75rem">
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Scraper Railway</span><span style="font-size:0.68rem;color:var(--green);font-family:var(--mono)">● Activo</span></div>
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Supabase DB</span><span style="font-size:0.68rem;color:var(--green);font-family:var(--mono)">● Conectado</span></div>
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Twilio WhatsApp</span><span style="font-size:0.68rem;color:var(--green);font-family:var(--mono)">● Operativo</span></div>
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Claude API</span><span style="font-size:0.68rem;color:var(--green);font-family:var(--mono)">● Operativo</span></div>
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Modo horario</span><span style="font-size:0.68rem;color:var(--cyan);font-family:var(--mono)">PICO · 3-5 min</span></div>
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Última revisión</span><span style="font-size:0.68rem;color:var(--text2);font-family:var(--mono)">hace 4 min</span></div>
+              <div class="cr" style="border:none;padding:0.28rem 0"><span style="font-size:0.72rem;color:var(--text2)">Próxima revisión</span><span style="font-size:0.68rem;color:var(--cyan);font-family:var(--mono)">en 3 min</span></div>
+            </div>
+          </div>
+          <div class="card"><div class="ch"><div class="ct">Conexiones API</div></div>
+            <div class="cb" style="padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem">
+              <div><div style="font-size:0.68rem;color:var(--text2);margin-bottom:0.3rem">Twilio Account SID</div><input class="ci2" type="password" value="ACxxxxxxxx" style="width:100%"></div>
+              <div><div style="font-size:0.68rem;color:var(--text2);margin-bottom:0.3rem">Supabase URL</div><input class="ci2" value="https://xxx.supabase.co" style="width:100%"></div>
+              <div><div style="font-size:0.68rem;color:var(--text2);margin-bottom:0.3rem">Anthropic API Key</div><input class="ci2" type="password" value="sk-ant-xxxxx" style="width:100%"></div>
+              <div><div style="font-size:0.68rem;color:var(--text2);margin-bottom:0.3rem">RUT Empresa (para OC)</div><input class="ci2" placeholder="12.345.678-9" style="width:100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- ═══ VISTA DETALLE ═══ -->
-<div class="view" id="vDetail">
-  <div class="topbar">
-    <div class="logo">MP_INTEL</div>
-    <button class="d-back" onclick="goBack()">← Volver a licitaciones</button>
-    <div class="t-right"><div class="t-time" id="dTime"></div></div>
-  </div>
-  <div class="d-scroll">
-    <div class="d-inner" id="dInner"></div>
-  </div>
-</div>
+<div class="tw" id="TW"></div>
 
 <script>
-var PRUEBA='F8537A18-6766-4DEF-9E59-426B4FEE2844';
-var BASE='https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.jsonp';
-var PAGE=50, AUTO=300000, TO=16000, cbN=0;
-var ticket='', all=[], filtered=[], page=0, activeTab='todas';
-var autoT=null, cdT=null, cds=0;
+const T={
+  dashboard:['Dashboard','Resumen de tu actividad — Mercado Público Chile'],
+  busqueda:['Búsqueda','21 oportunidades disponibles según tu configuración'],
+  detalle:['Detalle licitación','ID: 2494-32-LP26 · Construcción Señalética Coyhaique'],
+  seguimiento:['Seguimiento','Postulaciones activas en gestión'],
+  cierres:['Próximos cierres','Ordenados por urgencia'],
+  calendario:['Calendario','Abril 2026 — Fechas de cierre'],
+  financiero:['Finanzas','Facturado, OC y ganancia real por licitación'],
+  oc:['Órdenes de compra','Importadas automáticamente vía RUT empresa'],
+  presupuestos:['Presupuestos','Generados automáticamente en PDF'],
+  alertas:['Historial alertas','Registro de mensajes WhatsApp enviados'],
+  decjurada:['Declaración Jurada','Complétala una vez para todas las postulaciones'],
+  ia:['Analizar bases IA','Powered by Claude — Anthropic API'],
+  competidores:['Análisis de competidores','Inteligencia de mercado público'],
+  scraper:['Monitor scraper','Frecuencia dinámica — comportamiento humano'],
+  usuarios:['Usuarios','Gestión de accesos y roles'],
+  config:['Configuración','Palabras clave, alertas y conexiones']
+};
 
-function $(x){return document.getElementById(x);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-/* ── FORMAT ── */
-function fmtS(v){
-  if(!v||v==0)return'—'; var n=parseFloat(v); if(isNaN(n)||n==0)return'—';
-  if(n>=1e12)return'$'+(n/1e12).toFixed(1)+'T';
-  if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';
-  if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';
-  if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';
-  return'$'+n.toFixed(0);
-}
-function fmtL(v){
-  if(!v||v==0)return'—'; var n=parseFloat(v); if(isNaN(n))return'—';
-  return'$'+Math.round(n).toLocaleString('es-CL');
-}
-function pts(d){
-  if(!d)return 0;
-  if(typeof d==='string'&&d.indexOf('Date(')>=0)return parseInt(d.replace(/\/Date\((-?\d+)[^)]*\)\//,'$1'));
-  var t=Date.parse(d); return isNaN(t)?0:t;
-}
-function fmtD(d){var t=pts(d);if(!t)return'—';return new Date(t).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'});}
-function fmtDL(d){var t=pts(d);if(!t)return'—';return new Date(t).toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'});}
-function fmtDHr(d){var t=pts(d);if(!t)return'—';return new Date(t).toLocaleString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
-function past(d){var t=pts(d);return t>0&&t<Date.now();}
-function dateStr(offset){
-  var d=new Date(); d.setDate(d.getDate()+offset);
-  return String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+function ir(sec,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const s=document.getElementById('s-'+sec);
+  if(s)s.classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(T[sec]){document.getElementById('PT').innerHTML=`<div class="pt">${T[sec][0]}</div><div class="ps">${T[sec][1]}</div>`;}
+  document.querySelector('.content').scrollTop=0;
 }
 
-/* ── STATUS ── */
-function stInfo(cod){
-  var c=parseInt(cod);
-  if(c===5)return{lbl:'Activa',cls:'b-act',tab:'activa'};
-  if(c===8)return{lbl:'Adjudicada',cls:'b-adj',tab:'adjudicada'};
-  if(c===6)return{lbl:'Cerrada',cls:'b-cer',tab:'cerrada'};
-  if(c===7)return{lbl:'Desierta',cls:'b-des',tab:'otras'};
-  if(c===18)return{lbl:'Revocada',cls:'b-des',tab:'otras'};
-  if(c===19)return{lbl:'Suspendida',cls:'b-des',tab:'otras'};
-  return{lbl:'—',cls:'b-cer',tab:'otras'};
+const C={green:'var(--green)',blue:'var(--blue)',orange:'var(--orange)',red:'var(--red)',purple:'var(--purple)'};
+function toast(msg,color='green'){
+  const w=document.getElementById('TW');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<div class="tdot" style="background:${C[color]||C.green}"></div><div class="tmsg">${msg}</div>`;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),3200);
 }
 
-/* ── JSONP ── */
-function jfetch(url){
-  return new Promise(function(res,rej){
-    var n='_mp'+(++cbN),tid;
-    window[n]=function(d){clearTimeout(tid);delete window[n];var s=document.getElementById(n);if(s)s.remove();res(d);};
-    tid=setTimeout(function(){delete window[n];var s=document.getElementById(n);if(s)s.remove();rej(new Error('Timeout'));},TO);
-    var s=document.createElement('script');
-    s.id=n; s.src=url+'&callback='+n;
-    s.onerror=function(){clearTimeout(tid);delete window[n];s.remove();rej(new Error('Error de red'));};
-    document.head.appendChild(s);
-  });
+function sp(el){el.closest('.ptabs').querySelectorAll('.pt2').forEach(x=>x.classList.remove('active'));el.classList.add('active');}
+function sp2(el){
+  const p=el.closest('.lf')||el.closest('.cb')||el.parentElement;
+  if(p)p.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
 }
-function safe(p){return new Promise(function(r){p.then(r).catch(function(){r(null);});});}
-
-/* ── WELCOME ── */
-function useDemo(){$('wTk').value=PRUEBA;$('tInp').value=PRUEBA;doWelcome();}
-function doWelcome(){
-  var t=($('wTk').value||$('tInp').value).trim(); if(!t)return;
-  ticket=t; $('tInp').value=t;
-  $('welcome').classList.add('hidden');
-  try{localStorage.setItem('mp_t',t);}catch(e){}
-  loadAll();
-}
-function recargar(){
-  var t=$('tInp').value.trim();
-  if(!t){$('welcome').classList.remove('hidden');return;}
-  ticket=t;
-  try{localStorage.setItem('mp_t',t);}catch(e){}
-  loadAll();
-}
-
-/* ── LOAD ── */
-// Activas: ?estado=activas  (no requiere fecha)
-// Adjudicadas: ?fecha=DDMMAAAA&estado=adjudicada (requiere fecha — cargamos últimos 7 días)
-function loadAll(){
-  if(!ticket)return;
-  showOv('Cargando datos...','Activas + adjudicadas de los últimos 7 días',0);
-  $('btnR').classList.add('spin');
-
-  // Construir promesas: activas + 7 días de adjudicadas
-  var promises=[safe(jfetch(BASE+'?estado=activas&ticket='+ticket))];
-  for(var i=0;i<7;i++){
-    var fecha=dateStr(-i);
-    promises.push(safe(jfetch(BASE+'?fecha='+fecha+'&estado=adjudicada&ticket='+ticket)));
-  }
-
-  setOvP(20,'Esperando respuesta de la API...');
-
-  Promise.all(promises).then(function(rs){
-    setOvP(80,'Procesando...');
-
-    var dAct=rs[0];
-    if(!dAct&&rs.slice(1).every(function(r){return!r;})){
-      throw new Error('Sin respuesta de la API. Verifica tu ticket y conexión.');
-    }
-    if(dAct&&dAct.status==='error'){throw new Error(dAct.message||'Ticket inválido');}
-
-    var listAct=(dAct&&dAct.Listado)||[];
-    var seen={},combined=[];
-    listAct.forEach(function(l){if(!seen[l.CodigoExterno]){seen[l.CodigoExterno]=1;combined.push(l);}});
-
-    var adjCount=0;
-    rs.slice(1).forEach(function(r){
-      if(!r||!r.Listado)return;
-      r.Listado.forEach(function(l){
-        if(!seen[l.CodigoExterno]){seen[l.CodigoExterno]=1;combined.push(l);adjCount++;}
-      });
-    });
-
-    var prev=new Set(all.map(function(l){return l.CodigoExterno;}));
-    combined.forEach(function(l){l._new=!prev.has(l.CodigoExterno);});
-    all=combined;
-
-    setOvP(100,'Listo');
-    setTimeout(hideOv,280);
-    $('btnR').classList.remove('spin');
-
-    var now=new Date().toLocaleTimeString('es-CL');
-    $('tTime').textContent=now; $('dTime').textContent=now;
-    $('sSub').textContent='Act. '+now;
-    $('sAdjSub').textContent='Últimos 7 días ('+adjCount+')';
-    $('daysNote').style.display='flex';
-    $('daysNote').textContent='Adjudicadas: últimos 7 días';
-
-    page=0; refreshCounts(); applyFilters(); refreshStats(); schedAuto();
-  }).catch(function(e){
-    $('btnR').classList.remove('spin');
-    showOvErr(e.message);
-    console.error(e);
-  });
-}
-
-/* ── OVERLAY ── */
-function showOv(t,s,p){
-  var ov=$('ov'); ov.classList.remove('hidden');
-  ov.innerHTML='<div class="ov-sp"></div><div class="ov-t">'+esc(t)+'</div>'
-    +'<div class="ov-s" id="ovS">'+esc(s)+'</div>'
-    +'<div class="ov-bar"><div class="ov-fill" id="ovF" style="width:'+p+'%"></div></div>';
-}
-function setOvP(p,m){var f=$('ovF');if(f)f.style.width=p+'%';var s=$('ovS');if(s)s.textContent=m;}
-function hideOv(){$('ov').classList.add('hidden');}
-function showOvErr(msg){
-  var ov=$('ov'); ov.classList.remove('hidden');
-  ov.innerHTML='<div class="ov-err-ico">⚠</div>'
-    +'<div class="ov-err-t">No se pudo conectar</div>'
-    +'<div class="ov-err-m">'+esc(msg)+'<br><br>Verifica tu conexión e intenta nuevamente.<br>'
-    +'<a href="https://api.mercadopublico.cl/modules/Participa.aspx" target="_blank">Solicitar ticket propio ↗</a></div>'
-    +'<button class="ov-btn" onclick="hideOv()">Cerrar</button>';
-}
-
-/* ── COUNTS / STATS ── */
-function refreshCounts(){
-  $('c-todas').textContent=all.length;
-  ['activa','adjudicada','cerrada','otras'].forEach(function(tab){
-    $('c-'+tab).textContent=all.filter(function(l){return stInfo(l.CodigoEstado).tab===tab;}).length;
-  });
-}
-function refreshStats(){
-  $('sTot').textContent=all.length;
-  $('sAct').textContent=all.filter(function(l){return stInfo(l.CodigoEstado).tab==='activa';}).length;
-  var adj=all.filter(function(l){return stInfo(l.CodigoEstado).tab==='adjudicada';});
-  $('sAdj').textContent=adj.length;
-  var tot=adj.reduce(function(s,l){return s+(parseFloat(l.MontoEstimado)||0);},0);
-  $('sMon').textContent=fmtS(tot);
-}
-
-/* ── TABS ── */
-function setTab(btn){
-  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active'); activeTab=btn.dataset.tab; page=0; applyFilters();
-}
-
-/* ── FILTER ── */
-function applyFilters(){
-  var q=($('sInp').value||'').trim().toLowerCase();
-  var s=$('sortS').value;
-  filtered=all.filter(function(l){
-    if(activeTab!=='todas'&&stInfo(l.CodigoEstado).tab!==activeTab)return false;
-    if(q){
-      var org=(l.Organismo&&l.Organismo.NombreOrganismo)||'';
-      var prov=((l.Adjudicacion&&l.Adjudicacion.Proveedor)||[]).map(function(p){return p.NombreProveedor||'';}).join(' ');
-      if(((l.Nombre||'')+' '+org+' '+(l.CodigoExterno||'')+' '+prov).toLowerCase().indexOf(q)<0)return false;
-    }
-    return true;
-  });
-  filtered.sort(function(a,b){
-    if(s==='fd')return pts(b.FechaPublicacion)-pts(a.FechaPublicacion);
-    if(s==='fa')return pts(a.FechaPublicacion)-pts(b.FechaPublicacion);
-    if(s==='md')return(parseFloat(b.MontoEstimado)||0)-(parseFloat(a.MontoEstimado)||0);
-    if(s==='ma')return(parseFloat(a.MontoEstimado)||0)-(parseFloat(b.MontoEstimado)||0);
-    if(s==='na')return(a.Nombre||'').localeCompare(b.Nombre||'');
-    return 0;
-  });
-  $('sMos').textContent=filtered.length;
-  $('sFlt').textContent=q?'"'+q+'"':activeTab==='todas'?'Todos':activeTab;
-  $('rCnt').textContent=filtered.length+' resultado'+(filtered.length!==1?'s':'');
-  page=0; renderTable();
-}
-
-/* ── TABLE ── */
-function renderTable(){
-  var tot=filtered.length,s=page*PAGE,e=Math.min(s+PAGE,tot);
-  $('pInfo').textContent=tot===0?'Sin resultados':(s+1)+'–'+e+' de '+tot;
-  $('pPrev').disabled=page===0; $('pNext').disabled=e>=tot;
-  if(tot===0){
-    $('tbody').innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-i">◎</div>'
-      +'<div class="empty-t">Sin resultados</div>'
-      +'<div class="empty-s">No hay licitaciones para esta selección.</div></div></td></tr>';
-    return;
-  }
-  $('tbody').innerHTML=filtered.slice(s,e).map(function(l,i){
-    var idx=s+i, si=stInfo(l.CodigoEstado);
-    var org=(l.Organismo&&l.Organismo.NombreOrganismo)||'—';
-    return '<tr onclick="openDetail('+idx+')" class="'+(l._new?'new-row':'')+'">'
-      +'<td class="td-code">'+esc(l.CodigoExterno||'—')+'</td>'
-      +'<td><div class="td-nm">'+esc(l.Nombre||'Sin nombre')+'</div><div class="td-org">'+esc(org)+'</div></td>'
-      +'<td><span style="font-family:var(--mono);font-size:10px;color:var(--g2)">'+esc(l.Tipo||'—')+'</span></td>'
-      +'<td class="td-dt">'+fmtD(l.FechaPublicacion)+'</td>'
-      +'<td class="td-dt">'+fmtD(l.FechaCierre)+'</td>'
-      +'<td class="td-amt">'+fmtS(l.MontoEstimado)+'</td>'
-      +'<td><span class="badge '+si.cls+'">'+si.lbl+'</span></td>'
-      +'</tr>';
-  }).join('');
-}
-function chPage(dir){
-  var max=Math.ceil(filtered.length/PAGE)-1;
-  page=Math.max(0,Math.min(max,page+dir));
-  renderTable(); document.querySelector('.tbl-scroll').scrollTop=0;
-}
-
-/* ── DETAIL: abre vista y carga detalle completo por código ── */
-function openDetail(idx){
-  var l=filtered[idx]; if(!l)return;
-  $('vList').classList.remove('active');
-  $('vDetail').classList.add('active');
-  $('dInner').innerHTML='<div class="d-loading"><div class="d-spinner"></div>'
-    +'<div class="d-load-t">Cargando información completa...</div></div>';
-  document.querySelector('.d-scroll').scrollTop=0;
-
-  // Pedir detalle completo por código — trae dirección, comuna, RUT, monto exacto, etc.
-  jfetch(BASE+'?codigo='+encodeURIComponent(l.CodigoExterno)+'&ticket='+ticket)
-    .then(function(data){
-      var full=(data&&data.Listado&&data.Listado[0])||l;
-      $('dInner').innerHTML=buildDetail(full);
-    })
-    .catch(function(){
-      // Si falla, mostramos lo que ya tenemos
-      $('dInner').innerHTML=buildDetail(l);
-    });
-}
-function goBack(){
-  $('vDetail').classList.remove('active');
-  $('vList').classList.add('active');
-}
-
-/* ── BUILD DETAIL ── */
-function buildDetail(l){
-  var si=stInfo(l.CodigoEstado);
-  var org=(l.Organismo&&l.Organismo.NombreOrganismo)||'—';
-  var reg=(l.Organismo&&l.Organismo.RegionOrganismo)||'—';
-  var com=(l.Organismo&&l.Organismo.ComunaOrganismo)||(l.Organismo&&l.Organismo.Comuna)||'—';
-  var dir=(l.Organismo&&l.Organismo.DireccionOrganismo)||(l.Organismo&&l.Organismo.Direccion)||'—';
-  var provs=(l.Adjudicacion&&l.Adjudicacion.Proveedor)||[];
-  var mpUrl='https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion='+encodeURIComponent(l.CodigoExterno||'');
-
-  /* TIMELINE */
-  var fechas=[
-    {ico:'📅',lbl:'Publicación',d:l.FechaPublicacion},
-    {ico:'🔔',lbl:'Cierre de ofertas',d:l.FechaCierre},
-    {ico:'📂',lbl:'Apertura técnica',d:l.FechaAperturaTecnica||l.FechaApertura},
-    {ico:'💰',lbl:'Apertura económica',d:l.FechaAperturaEconomica},
-    {ico:'🏆',lbl:'Adjudicación',d:l.FechaAdjudicacion},
-  ].filter(function(x){return pts(x.d)>0;});
-  var tlHtml=fechas.length?fechas.map(function(x){
-    var p=past(x.d);
-    return '<div class="tl-row'+(p?' past':'')+'"><div class="tl-ico">'+x.ico+'</div>'
-      +'<div class="tl-info"><div class="tl-l">'+x.lbl+'</div><div class="tl-d">'+fmtDHr(x.d)+'</div></div>'
-      +(p?'<span class="tl-tag">Pasada</span>':'')+'</div>';
-  }).join(''):'<div class="no-adj">Sin fechas registradas</div>';
-
-  /* WINNERS */
-  var winHtml=provs.length?provs.map(function(p){
-    return '<div class="win-box"><div class="win-label">Empresa ganadora</div>'
-      +'<div class="win-name">'+esc(p.NombreProveedor||'—')+'</div>'
-      +(p.RutProveedor?'<div class="win-rut">RUT: '+esc(p.RutProveedor)+'</div>':'')
-      +(p.montoTotalAdjudicado||p.MontoAdjudicado?
-        '<div class="win-amt-wrap"><div class="win-amt-l">Monto adjudicado</div>'
-        +'<div class="win-amt-v">'+fmtL(p.montoTotalAdjudicado||p.MontoAdjudicado)
-        +' <span style="font-size:12px;color:var(--g2)">CLP</span></div></div>':'')
-      +'</div>';
-  }).join(''):'<div class="no-adj">Sin adjudicación registrada</div>';
-
-  /* HTML */
-  var h='';
-  h+='<div class="d-eyebrow">'+esc(l.CodigoExterno||'—')+'</div>';
-  h+='<div class="d-title">'+esc(l.Nombre||'Sin nombre')+'</div>';
-  h+='<div class="d-org">'+esc(org)+'</div>';
-  h+='<div class="d-badges">'
-    +'<span class="badge '+si.cls+'">'+si.lbl+'</span>'
-    +(l.Tipo?'<span class="badge" style="color:var(--g1);background:var(--surface2);border:1px solid var(--border2)">'+esc(l.Tipo)+'</span>':'')
-    +(l.UnidadMoneda&&l.UnidadMoneda!=='CLP'?'<span class="badge" style="color:var(--amber);background:rgba(212,146,42,.08);border:1px solid rgba(212,146,42,.2)">'+esc(l.UnidadMoneda)+'</span>':'')
-    +'</div>';
-
-  /* Grid: Info + Localización */
-  h+='<div class="d-grid">';
-
-  h+='<div class="card" style="--ct-c:var(--green)">'
-    +'<div class="card-title">Información general</div>'
-    +'<div class="kv"><span class="kv-k">Organismo</span><span class="kv-v">'+esc(org)+'</span></div>'
-    +'<div class="kv"><span class="kv-k">Estado</span><span class="kv-v green">'+si.lbl+'</span></div>'
-    +'<div class="kv"><span class="kv-k">Tipo licitación</span><span class="kv-v">'+esc(l.Tipo||'—')+'</span></div>'
-    +'<div class="kv"><span class="kv-k">Monto estimado</span><span class="kv-v money">'+fmtL(l.MontoEstimado)+' '+(l.UnidadMoneda||'CLP')+'</span></div>'
-    +(l.NumeroItems?'<div class="kv"><span class="kv-k">Ítems</span><span class="kv-v">'+esc(l.NumeroItems)+'</span></div>':'')
-    +'</div>';
-
-  h+='<div class="card" style="--ct-c:var(--blue)">'
-    +'<div class="card-title">Localización</div>'
-    +'<div class="kv"><span class="kv-k">Región</span><span class="kv-v">'+esc(reg)+'</span></div>'
-    +'<div class="kv"><span class="kv-k">Comuna</span><span class="kv-v">'+esc(com)+'</span></div>'
-    +'<div class="kv"><span class="kv-k">Dirección</span><span class="kv-v">'+esc(dir)+'</span></div>'
-    +(l.Organismo&&l.Organismo.CodigoOrganismo?'<div class="kv"><span class="kv-k">Cód. organismo</span><span class="kv-v muted">'+esc(l.Organismo.CodigoOrganismo)+'</span></div>':'')
-    +'</div>';
-
-  h+='</div>'; /* /d-grid */
-
-  /* Fechas */
-  h+='<div class="d-grid full"><div class="card" style="--ct-c:var(--amber)">'
-    +'<div class="card-title">Fechas clave</div>'
-    +'<div class="tl">'+tlHtml+'</div>'
-    +'</div></div>';
-
-  /* Descripción */
-  if(l.Descripcion){
-    h+='<div class="d-grid full"><div class="card" style="--ct-c:#a55eea">'
-      +'<div class="card-title">Descripción</div>'
-      +'<div class="desc-box">'+esc(l.Descripcion)+'</div>'
-      +'</div></div>';
-  }
-
-  /* Adjudicación */
-  h+='<div class="d-grid full"><div class="card" style="--ct-c:var(--green)">'
-    +'<div class="card-title">Adjudicación</div>'
-    +winHtml
-    +'</div></div>';
-
-  /* Acciones */
-  h+='<div class="d-grid full"><div class="card" style="--ct-c:var(--g2)">'
-    +'<div class="card-title">Acciones</div>'
-    +'<div class="act-row">'
-    +'<a href="'+mpUrl+'" target="_blank" class="abtn abtn-p">Ver en Mercado Público ↗</a>'
-    +'<button onclick="buscar(\''+esc(org).replace(/'/g,"\\'").substring(0,60)+'\')" class="abtn abtn-g">Todas de este organismo</button>'
-    +(provs[0]&&provs[0].NombreProveedor?'<button onclick="buscar(\''+esc(provs[0].NombreProveedor).replace(/'/g,"\\'").substring(0,50)+'\')" class="abtn abtn-g">Más adj. de este proveedor</button>':'')
-    +'</div>'
-    +'</div></div>';
-
-  return h;
-}
-
-function buscar(q){
-  goBack(); $('sInp').value=q;
-  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
-  document.querySelector('[data-tab="todas"]').classList.add('active');
-  activeTab='todas'; applyFilters();
-}
-
-/* ── AUTO ── */
-function schedAuto(){
-  clearTimeout(autoT); clearInterval(cdT);
-  cds=AUTO/1000; tickCd();
-  cdT=setInterval(function(){cds--;tickCd();if(cds<=0)clearInterval(cdT);},1000);
-  autoT=setTimeout(loadAll,AUTO);
-  $('cdEl').style.display='flex';
-}
-function tickCd(){var m=Math.floor(cds/60),s=cds%60;$('cdVal').textContent=m+':'+String(s).padStart(2,'0');}
-
-/* ── INIT ── */
-$('tInp').addEventListener('keydown',function(e){if(e.key==='Enter')recargar();});
-$('wTk').addEventListener('keydown',function(e){if(e.key==='Enter')doWelcome();});
-try{
-  var saved=localStorage.getItem('mp_t');
-  if(saved){$('tInp').value=saved;$('wTk').value=saved;ticket=saved;$('welcome').classList.add('hidden');loadAll();}
-}catch(e){}
 </script>
 </body>
 </html>
